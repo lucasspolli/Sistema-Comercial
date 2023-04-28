@@ -1,8 +1,8 @@
 from time import sleep
-from funcoes_ecommerce_sql import *
+from funcoes_sistema import *
 import sqlite3
 
-connection = sqlite3.connect('ecommerce.db')
+connection = sqlite3.connect('banco_de_dados.db')
 cursor = connection.cursor()
 
 def create_table():
