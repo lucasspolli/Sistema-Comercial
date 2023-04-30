@@ -11,15 +11,12 @@ def create_table():
                         email varchar(20), 
                         senha varchar(20), 
                         id varchar(4))''')
-    #preço varchar(8), quantidade varchar(20), pago text
 
 create_table()
 
 inicio()
 sleep(0.5)
-print("\033[0;33mSeja bem vindo(a) ao maior sistema comercial da América Latina!\033[m")
-key = True
-valor_pago = 0
+print("\033[0;32mSeja bem vindo(a) ao maior sistema comercial da América Latina!\033[m")
 logged = False
 while logged == False:
     sleep(0.5)
@@ -28,15 +25,15 @@ while logged == False:
         sleep(0.5)
         logged = Register()
     elif opcao == 2:
-        sleep(1)
-        remover_produto()
+        sleep(0.5)
+        logged = Login()
     elif opcao == 3:
         connection.close()
         break
     else:
         sleep(1)
         print(f"\033[0;31mOpção inválida!\033[m")
-sleep(1)
-print("="*57)
+sleep(0.5)
+print("="*66)
 sleep(0.5)
 print("\033[0;32mObrigado por usar o nosso sistema! Volte sempre!\033[m")
