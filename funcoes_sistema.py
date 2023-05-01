@@ -1,27 +1,30 @@
-from time import sleep
+# IMPORTAÇÕES PARA O SISTEMA FUNCIONAR
 import sqlite3
-
+import os
+from time import sleep
+# CONECTAR AO BANCO DE DADOS
 connection = sqlite3.connect('banco_de_dados.db')
 cursor = connection.cursor()
-
 # INÍCIO
 sistema = "S I S T E M A"
 comercial = "C O M E R C I A L"
 
 def inicio():
+    print("\n" * os.get_terminal_size().lines)
+    sleep(1)
     print("="*66)
-    print(f"{sistema:^66}")
-    print(f"{comercial:^66}")
+    print(f"\033[0;34m{sistema:^66}\033[m")
+    print(f"\033[0;34m{comercial:^66}\033[m")
     print("="*66)
-# MENU
-def menu():
+# MENU INICIAL
+def Menu_inicial():
     print("="*66)
     sleep(0.7)
-    print("1 - Registrar")
+    print("\033[0;33m1\033[m - Registrar uma conta")
     sleep(0.4)
-    print("2 - Logar")
+    print("\033[0;33m2\033[m - Logar em uma conta")
     sleep(0.4)
-    print("3 - Sair do menu")
+    print("\033[0;33m3\033[m - Sair do menu")
     sleep(0.4)
     while True:
         try:
@@ -33,7 +36,7 @@ def menu():
     return opcao
 # REGISTRAR CONTA ==================================================================================================
 def Register():
-    print("="*66)
+    inicio()
     # CONFIRMAÇÃO DO NOME DO USUÁRIO
     username_confirmation = False
     while username_confirmation == False:
@@ -86,15 +89,17 @@ def Register():
             comand = f"INSERT INTO clientes (usuario, email, senha, id) VALUES('{username}', '{email}', '{password}', '{id}')"
             cursor.execute(comand)
             connection.commit()
-            sleep(1)
-            print("\033[0;32mSeu usuário foi adicionado ao sistema!\033[m")
+            user = cursor.execute(f"SELECT * FROM clientes WHERE usuario = '{username}' OR email = '{email}'")
+            user = user.fetchall()
+            sleep(1.5)
+            print(f"\033[0;32mSeja bem-vindo, {user[0][0]}!\033[m")
             password_confirmation = True
-            sleep(0.5)
+            sleep(2)
             logged = True
     return logged
 # LOGAR NA CONTA ===================================================================================================
 def Login():
-    print("="*66)
+    inicio()
     # VERIFICAR SE EXISTE O NOME DE USUÁRIO OU EMAIL
     username_or_email_exists = False
     while username_or_email_exists == False:
@@ -111,6 +116,7 @@ def Login():
         else:
             password_confirmation = False
             while password_confirmation == False:
+                sleep(1)
                 password = str(input("\033[0;33mDigite sua senha: \033[m"))
                 user_password = user[0][2]
                 # AS SENHAS ESTÃO INCORRETAR
@@ -120,93 +126,114 @@ def Login():
                     password_confirmation = False
                 # USUÁRIO ESTÁ LOGADO
                 else:
-                    sleep(1)
+                    sleep(1.5)
                     print(f"\033[0;32mSeja bem-vindo, {user[0][0]}!\033[m")
+                    sleep(2)
                     password_confirmation = True
                     username_or_email_exists = True
+                    logged = True
                     break
-                logged = True
     return logged
-# CONSULTAR VALOR DO CARRINHO
-def consultar_carrinho(valor_pago):
-    soma = 0
-    print("="*66)
-    sleep(0.2)
-    print("\033[0;33mSegue abaixo o valor total do seu carrinho:\033[m")
+# MENU FINAL =======================================================================================================
+def Menu_final():
+    inicio()
+    sleep(0.7)
+    print("1 - Ver produtos cadastrados")
+    sleep(0.4)
+    print("2 - Cadastrar produtos")
+    sleep(0.4)
+    print("3 - Sair do menu")
+    sleep(0.4)
+    while True:
+        try:
+            opcao = int(input("\033[0;33mEscolha uma das opções acima para continuar: \033[m"))
+            break
+        except ValueError:
+            sleep(1)
+            print(f"\033[0;31mDigite um número!\033[m")
+    return opcao
+# CADASTRAR PRODUTOS ===============================================================================================
+def Register_products():
+    inicio()
+    print("\033[0;33mVamos cadastrar seu produto!\033[m")
     sleep(1)
-    cursor.execute("SELECT * FROM dados")
-    resultado = cursor.fetchall()
-    if resultado != []:
-        for produto in resultado:
-            if produto[4] == 'nao':
-                quantidade = int(produto[3])
-                preço = float(produto[2])
-                if quantidade > 1:
-                    soma += preço * quantidade
-                else:
-                    soma += preço
-    else:
-        sleep(1)
-        print(f"\033[0;32mA soma do seu carrinho deu R$0.00!\033[m")
-        sleep(0.5)
-        print(f"\033[0;32mNão tem nada à ser pago aqui!\033[m")
-        sleep(1)
-        return valor_pago
-    print(f"\033[0;32mA soma do seu carrinho deu R${soma:.2f}!\033[m")
-    cursor.execute("SELECT * FROM dados")
-    resultado = cursor.fetchall()
-    sim = 'sim'
-    for produto in resultado:
-        if produto[4] == 'nao':
-            print(soma, valor_pago)
-            if soma != valor_pago:
-                sleep(1)
-                print("\033[0;33mVocê tem produtos que não foram pagos! \033[m")
-                sleep(1)
-                print(f"\033[0;33mA diferença é de R${soma:.2f}! \033[m")
-                while True:
+    # VERIFICAR O NOME DO PRODUTO
+    product_confirmation = False
+    while product_confirmation == False:
+        product_name = str(input("\033[0;33mDigite o nome do seu produto: \033[m"))
+        product = cursor.execute(f"SELECT * FROM produtos WHERE nome = '{product_name}'")
+        product = product.fetchall()
+        # REGISTRAR O PREÇO DO PRODUTO
+        if product == []:
+            product_price = str(input("\033[0;33mDigite o preço do seu produto: \033[m"))
+            sleep(1)
+            # VERIFICAR O ID DO PRODUTO
+            id_confirmation = False
+            while id_confirmation == False:
+                product_id = str(input("\033[0;33mDigite o id do seu produto (de 0 à 999): \033[m"))
+                product = cursor.execute(f"SELECT * FROM produtos WHERE id = '{product_id}'")
+                product = product.fetchall()
+                # REGISTRAR A QUANTIDADE DO PRODUTO EM ESTOQUE
+                if product == []:
+                    product_quantify = str(input("\033[0;33mDigite a quantidade do seu produto que tem em estoque: \033[m"))
+                    # ADICIONAR O PRODUTO À TABELA PRODUTOS NO BANCO DE DADOS
+                    comand = f"INSERT INTO produtos (nome, preço, quantidade, id) VALUES('{product_name}', '{product_price}', '{product_quantify}', '{product_id}')"
+                    cursor.execute(comand)
+                    connection.commit()
                     sleep(1)
-                    escolha = str(input("\033[0;33mVocê deseja pagar a sua conta? (sim/nao) \033[m"))
-                    if escolha in "nao":
-                        break
-                    elif escolha in "sim":
-                        sleep(0.2)
-                        print("="*57)
-                        sleep(0.2)
-                        print("1 - Pagar no dinheiro")
-                        sleep(0.2)
-                        print("2 - Pagar no débito")
-                        sleep(0.2)
-                        print("3 - Pagar no crédito")
-                        sleep(0.2)
-                        opcao = int(input("\033[0;33mComo você deseja pagar a sua conta? \033[m"))
-                        sleep(1)
-                        if opcao == 1:
-                            print(f"\033[0;32mVocê pagou R${soma:.2f} no dinheiro à vista!\033[m")
-                            cursor.execute("UPDATE dados SET pago = '"+sim+"'")
-                            connection.commit()
-                            valor_pago += soma
-                            return valor_pago
-                        elif opcao == 2:
-                            print(f"\033[0;32mVocê pagou R${soma:.2f} no débito!\033[m")
-                            cursor.execute("UPDATE dados SET pago = '"+sim+"'")
-                            connection.commit()
-                            valor_pago += soma
-                            return valor_pago
-                        elif opcao == 3:
-                            parcelas = int(input("\033[0;33mEm quantas parcelas você deseja pagar a sua conta? \033[m"))
-                            sleep(1)
-                            parcelado = soma / parcelas
-                            print(f"\033[0;32mVocê irá pagar {parcelas}x de R${parcelado:.2f} no crédito!\033[m")
-                            cursor.execute("UPDATE dados SET pago = '"+sim+"'")
-                            connection.commit()
-                            valor_pago += soma
-                            return valor_pago
-                        else:
-                            print(f"\033[0;31mDigite uma opção válida!\033[m")
-                    else:
-                        print(f"\033[0;31mDigite apenas: sim/nao\033[m")
-            else:
-                sleep(1)
-                print(f"\033[0;32mA sua conta de R${soma:.2f} já foi paga!\033[m")
-                return valor_pago
+                    # FINALIZAÇÃO DA FUNÇÃO
+                    print("\033[0;32mSeu produto foi adicionado ao sistema!\033[m")
+                    id_confirmation = True
+                    product_confirmation = True
+                    sleep(1)
+                    break
+                # JÁ EXISTE UM PRODUTO COM O ID DIGITADO
+                elif product_id == product[0][3]:
+                    sleep(1)
+                    print("\033[0;31mEste id já existe!\033[m")
+                    id_confirmation = False
+        # JÁ EXISTE UM PRODUTO COM O NOME DIGITADO
+        elif product_name == product[0][0]:
+            sleep(1)
+            print("\033[0;31mEste nome de produto já existe!\033[m")
+            product_confirmation = False
+# PRODUTOS CADASTRADOS =============================================================================================
+def Registred_products():
+    inicio()
+    sleep(0.5)
+    # LISTA DOS PRODUTOS CADASTRADOS NO BANCO DE DADOS
+    print("\033[0;32mAqui está a lista dos produtos cadastrados:\033[m")
+    nome = "Nome"
+    preço = "Preço"
+    quantidade = "Quantidade"
+    id = "Id"
+    sleep(1)
+    print(f"\033[0;33m{nome:<14}{preço:<10}{quantidade:<15}{id}\033[m")
+    # SELECIONAR OS PRODUTOS NO BANCO DE DADOS
+    product = cursor.execute(f"SELECT * FROM produtos")
+    product = product.fetchall()
+    # MOSTRAR AS INFORMAÇÕES DE TODOS OS PRODUTOS REGISTRADOS
+    for products in product:
+        name = products[0]
+        price = float(products[1])
+        quantify = products[2]
+        id = products[3]
+        sleep(1)
+        print(f"{name:<12}R${price:<13.2f}{quantify:<12}{id}")
+    answer = False
+    while answer == False:
+        sleep(1)
+        answer = str(input("\033[0;33mVocê deseja voltar ao menu (s/n)? \033[m"))
+        if answer not in "sn":
+            sleep(1)
+            print("\033[0;31mDigite somente s/n!\033[m")
+            answer = False
+        elif answer == "n":
+            sleep(1)
+            print("\033[0;32mTudo bem!\033[m")
+            answer = False
+        else:
+            sleep(1)
+            print("\033[0;32mTe redirecionando para o menu!\033[m")
+            answer = True
+            sleep(1)
