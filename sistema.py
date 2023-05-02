@@ -21,43 +21,48 @@ def create_registred_products_table():
                         id varchar(4))''')
 # CRIAR A TABELA CLIENTES E PRODUTOS
 create_clients_table(), create_registred_products_table()
-# INÍCIO DO SISTEMA
-inicio()
-sleep(0.5)
-print("\033[0;32mSeja bem vindo(a) ao maior sistema comercial da América Latina!\033[m")
 # MENU INICIAL COM ESCOLHA DO USUÁRIO ==============================================================================
-logged = False
-while logged == False:
-    sleep(0.5)
-    opcao = Menu_inicial()
-    if opcao == 1:
-        sleep(1)
-        logged = Register()
-    elif opcao == 2:
-        sleep(1)
-        logged = Login()
-    elif opcao == 3:
-        connection.close()
-        break
-    else:
-        sleep(1)
-        print(f"\033[0;31mOpção inválida!\033[m")
+def menu_inicial():
+    logged = False
+    while logged == False:
+        sleep(0.5)
+        botao_final = Menu_inicial()
+        if botao_final == 1:
+            sleep(1)
+            logged = Register()
+        elif botao_final == 2:
+            sleep(1)
+            logged = Login()
+        elif botao_final == 3:
+            connection.close()
+            break
+        else:
+            sleep(1)
+            print(f"\033[0;31mOpção inválida!\033[m")
+    return logged
+logged = menu_inicial()
 # MENU FINAL COM ESCOLHA DO USUÁRIO ================================================================================
-while logged == True:
-    sleep(0.5)
-    opcao2 = Menu_final()
-    if opcao2 == 1:
+def menu_final():
+    logged = True
+    while logged == True:
         sleep(0.5)
-        Registred_products()
-    elif opcao2 == 2:
-        sleep(0.5)
-        Register_products()
-    elif opcao2 == 3:
-        connection.close()
-        break
-    else:
-        sleep(1)
-        print(f"\033[0;31mOpção inválida!\033[m")
+        botao_final = Menu_final()
+        if botao_final == 1:
+            sleep(0.5)
+            Registred_products()
+        elif botao_final == 2:
+            sleep(0.5)
+            Register_products()
+        elif botao_final == 3:
+            logged = menu_inicial()
+            if logged == True:
+                continue
+            else:
+                break
+        else:
+            sleep(1)
+            print(f"\033[0;31mOpção inválida!\033[m")
+menu_final()
 # FINALIZAÇÃO DO SISTEMA ===========================================================================================
 sleep(0.5)
 print("="*66)
