@@ -27,13 +27,13 @@ python --version
 git init
 ```
 
-3º Passo - Após isto, clone o projeto para a sua máquina utilizando o seguinte comando:
+3º Passo - Clone o projeto para a sua máquina utilizando o seguinte comando:
 
 ```
 git pull https://github.com/lucasspolli/Sistema-Comercial.git main
 ```
 
-4º Passo - E depois rode o projeto utilizando o seguinte comando:
+4º Passo - Rode o projeto utilizando o seguinte comando:
 
 ```
 python sistema.py
