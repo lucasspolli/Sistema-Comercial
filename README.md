@@ -20,7 +20,7 @@ Dentre suas funções estão:
 2º Passo - Em uma pasta separada, no terminal, clone o projeto para a sua máquina utilizando o seguinte comando:
 
 ```
-git pull https://github.com/lucasspolli/Sistema-Comercial.git master
+git pull https://github.com/lucasspolli/Sistema-Comercial.git main
 ```
 
 3º Passo - Rode o projeto utilizando o seguinte comando:
