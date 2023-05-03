@@ -15,15 +15,25 @@ Dentre suas funções estão:
 ![Python](http://ForTheBadge.com/images/badges/made-with-python.svg)
 #
 ### Como Rodar o Projeto 💽
-1º Passo - Certifique-se que o Python está instalado em sua máquina.
+1º Passo - Certifique-se que o Python está instalado em sua máquina utilizando o seguinte comando no terminal:
 
-2º Passo - Em uma pasta separada, no terminal, clone o projeto para a sua máquina utilizando o seguinte comando:
+```
+python --version
+```
+
+2º Passo - Em uma pasta separada, abra o terminal e utilize o seguinte comando:
+
+```
+git init
+```
+
+3º Passo - Após isto, clone o projeto para a sua máquina utilizando o seguinte comando:
 
 ```
 git pull https://github.com/lucasspolli/Sistema-Comercial.git main
 ```
 
-3º Passo - Rode o projeto utilizando o seguinte comando:
+4º Passo - E depois rode o projeto utilizando o seguinte comando:
 
 ```
 python sistema.py
