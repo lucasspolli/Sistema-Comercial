@@ -3,7 +3,7 @@
 Sistema Comercial é uma aplicação de um sistema desenvolvido para fins universitários com diversas funções utilizando como linguagem o Python.
 
 Dentre suas funções estão:
-- Cadastrar um usuário
+- Cadastrar uma conta de usuário
 
 - Fazer login em uma conta cadastrada
 
