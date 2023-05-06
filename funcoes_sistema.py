@@ -120,8 +120,12 @@ def Register():
                             password_confirmation = False
                         # ADICIONAR O USUÁRIO AO BANCO DE DADOS
                         else:
-                            comand = f"INSERT INTO clientes (usuario, email, senha, id) VALUES('{username}', '{email}', '{password}', '{id}')"
-                            cursor.execute(comand)
+                            cursor.execute(f"INSERT INTO clientes (usuario, email, senha, id) VALUES('{username}', '{email}', '{password}', '{id}')")
+                            cursor.execute(f'''CREATE TABLE IF NOT EXISTS '{id}' (
+                                                nome varchar(1),
+                                                preço varchar(1),
+                                                quantidade varchar(1),
+                                                id varchar(1))''')
                             connection.commit()
                             user = cursor.execute(f"SELECT * FROM clientes WHERE usuario = '{username}' OR email = '{email}'")
                             user = user.fetchall()
@@ -132,7 +136,7 @@ def Register():
                             username_confirmation = True
                             logged = True
                             sleep(1)
-    return logged
+    return logged, id
 # LOGAR NA CONTA ===================================================================================================
 def Login():
     inicio()
@@ -195,7 +199,9 @@ def Menu_final():
     sleep(0.4)
     print("\033[0;33m2\033[m - Cadastrar produtos")
     sleep(0.4)
-    print("\033[0;33m3\033[m - Sair da conta")
+    print("\033[0;33m3\033[m - Comprar um produto")
+    sleep(0.4)
+    print("\033[0;33m4\033[m - Sair da conta")
     sleep(0.4)
     while True:
         try:
@@ -212,14 +218,14 @@ def Registred_products():
     # LISTA DOS PRODUTOS CADASTRADOS NO BANCO DE DADOS
     print("\033[0;32mAqui está a lista dos produtos cadastrados:\033[m")
     sleep(0.5)
-    print(f"\033[0;33m{'Nome':<14}{'Preço':<12}{'Quantidade':<15}{'ID'}\033[m")
+    print(f"\033[0;33m{'Nome':<24}{'Preço':<12}{'Quantidade':<15}{'ID'}\033[m")
     # SELECIONAR OS PRODUTOS NO BANCO DE DADOS
     product = cursor.execute(f"SELECT * FROM produtos")
     product = product.fetchall()
     # MOSTRAR AS INFORMAÇÕES DE TODOS OS PRODUTOS REGISTRADOS
     for products in product:
         sleep(0.3)
-        print(f"{products[0]:<12}R${float(products[1]):<15.2f}{products[2]:<12}{products[3]}")
+        print(f"{products[0]:<22}R${float(products[1]):<15.2f}{products[2]:<12}{products[3]}")
     # ESPERANDO RESPOSTA DO USUÁRIO PARA VOLTAR AO MENU
     answer = False
     while answer == False:
@@ -255,49 +261,121 @@ def Register_products():
         product = cursor.execute(f"SELECT * FROM produtos WHERE nome = '{product_name}'")
         product = product.fetchall()
         # REGISTRAR O PREÇO DO PRODUTO
-        sleep(1)
         if product == []:
-            product_price = str(input("\033[0;33mDigite o preço do seu produto: \033[m"))
-            # SUBSTITUIR A VÍRGULA PELO PONTO NO PREÇO
-            product_price = product_price.replace(",", ".")
-            # VERIFICA SE O USUÁRIO QUER SAIR
-            if product_price == "0":
-                sleep(0.7)
-                print("\033[0;32mRetornando ao menu!\033[m")
-                sleep(0.7)
-                product_confirmation = True
-                break
-            sleep(1)
-            product_quantify = str(input("\033[0;33mDigite a quantidade do seu produto que tem em estoque: \033[m"))
-            # VERIFICA SE O USUÁRIO QUER SAIR
-            if product_quantify == "0":
-                sleep(0.7)
-                print("\033[0;32mRetornando ao menu!\033[m")
-                sleep(0.7)
-                product_confirmation = True
-                break
-            # SELECIONAR OS PRODUTOS NO BANCO DE DADOS
-            product = cursor.execute(f"SELECT * FROM produtos")
-            product = product.fetchall()
-            # DEFINIR O ID DO PRODUTO
-            product_id = 0
-            if product == []:
-               pass
-            else:
-                for products_id in product:
-                    product_id = product_id + 1
-            # ADICIONAR O PRODUTO À TABELA PRODUTOS NO BANCO DE DADOS
-            comand = f"INSERT INTO produtos (nome, preço, quantidade, id) VALUES('{product_name}', '{product_price}', '{product_quantify}', '{product_id}')"
-            cursor.execute(comand)
-            connection.commit()
-            sleep(1)
-            # FINALIZAÇÃO DA FUNÇÃO
-            print("\033[0;32mSeu produto foi adicionado ao sistema!\033[m")
-            product_confirmation = True
-            sleep(1)
-            break
+            price_confirmation = False
+            while price_confirmation == False:
+                sleep(1)
+                product_price = str(input("\033[0;33mDigite o preço do seu produto: \033[m"))
+                if "." in product_price:
+                    sleep(1)
+                    print("\033[0;31mDigite somente os números do preço!\033[m")
+                    price_confirmation = False
+                else:
+                    # SUBSTITUIR A VÍRGULA PELO PONTO NO PREÇO
+                    product_price = product_price.replace(",", ".")
+                    # VERIFICA SE O USUÁRIO QUER SAIR
+                    if product_price == "0":
+                        sleep(0.7)
+                        print("\033[0;32mRetornando ao menu!\033[m")
+                        sleep(0.7)
+                        price_confirmation = True
+                        product_confirmation = True
+                        break
+                    sleep(1)
+                    product_quantify = str(input("\033[0;33mDigite a quantidade do seu produto que tem em estoque: \033[m"))
+                    # VERIFICA SE O USUÁRIO QUER SAIR
+                    if product_quantify == "0":
+                        sleep(0.7)
+                        print("\033[0;32mRetornando ao menu!\033[m")
+                        sleep(0.7)
+                        price_confirmation = True
+                        product_confirmation = True
+                        break
+                    # SELECIONAR OS PRODUTOS NO BANCO DE DADOS
+                    product = cursor.execute(f"SELECT * FROM produtos")
+                    product = product.fetchall()
+                    # DEFINIR O ID DO PRODUTO
+                    product_id = 0
+                    if product == []:
+                        pass
+                    else:
+                        for products_id in product:
+                            product_id = product_id + 1
+                    # ADICIONAR O PRODUTO À TABELA PRODUTOS NO BANCO DE DADOS
+                    comand = f"INSERT INTO produtos (nome, preço, quantidade, id) VALUES('{product_name}', '{product_price}', '{product_quantify}', '{product_id}')"
+                    cursor.execute(comand)
+                    connection.commit()
+                    sleep(1)
+                    # FINALIZAÇÃO DA FUNÇÃO
+                    print("\033[0;32mSeu produto foi adicionado ao sistema!\033[m")
+                    price_confirmation = True
+                    product_confirmation = True
+                    sleep(1)
+                    break
         # JÁ EXISTE UM PRODUTO COM O NOME DIGITADO
         elif product_name == product[0][0]:
             sleep(1)
             print("\033[0;31mEste nome de produto já existe!\033[m")
             product_confirmation = False
+# COMPRAR PRODUTOS =================================================================================================
+def Buy_product(id):
+    inicio()
+    # LISTA DOS PRODUTOS CADASTRADOS NO BANCO DE DADOS
+    sleep(0.5)
+    print("\033[0;32mAqui está a lista dos produtos cadastrados:\033[m")
+    sleep(0.5)
+    print(f"\033[0;33m{'Nome':<24}{'Preço':<12}{'Quantidade':<15}{'ID'}\033[m")
+    # SELECIONAR OS PRODUTOS NO BANCO DE DADOS
+    product = cursor.execute(f"SELECT * FROM produtos")
+    product = product.fetchall()
+    # MOSTRAR AS INFORMAÇÕES DE TODOS OS PRODUTOS REGISTRADOS
+    for products in product:
+        sleep(0.3)
+        print(f"{products[0]:<22}R${float(products[1]):<15.2f}{products[2]:<12}{products[3]}")
+    # RECEBER INFORMAÇÕES DOS PRODUTOS QUE DESEJAM COMPRAR
+    confirmation = False
+    while confirmation == False:
+        sleep(0.5)
+        product_id = str(input("\033[0;33mDigite o ID do produto que deseja comprar: \033[m"))
+        product = cursor.execute(f"SELECT * FROM produtos WHERE id = '{product_id}'")
+        product = product.fetchall()
+        # ID DIGITADO NÃO EXISTE
+        if product == []:
+            sleep(1)
+            print("\033[0;31mEste ID de produto não existe!\033[m")
+            confirmation = False
+        # ID EXISTE NO BANCO DE DADOS
+        elif product_id == product[0][3]:
+            sleep(1)
+            inicio()
+            sleep(0.5)
+            print("\033[0;33mO produto escolhido foi:\033[m")
+            sleep(0.5)
+            print(f"\033[0;32m{product[0][0]} que custa R${product[0][1]} com {product[0][2]} quantidades em estoque e seu ID é {product[0][3]}\033[m")
+            # CONFIRMAR A QUANTIDADE QUE O USUÁRIO QUE COMPRAR
+            product_quantify_confirmation = False
+            while product_quantify_confirmation == False:
+                sleep(1)
+                product_quantify = str(input("\033[0;33mDigite a quantidade que deseja comprar: \033[m"))
+                product_quantify = int(product_quantify)
+                product_quantify_avaiable = int(product[0][2])
+                # QUANTIDADE ESTÁ DENTRO DAS REGRAS
+                if (product_quantify <= product_quantify_avaiable) and (product_quantify > 0):
+                    # ADICIONAR O PRODUTO AO CARRINHO DO USUÁRIO
+                    cursor.execute(f"INSERT INTO '{id}' (nome, preço, quantidade, id) VALUES('{product[0][0]}', '{product[0][1]}', '{product_quantify}', '{product[0][3]}')")
+                    connection.commit()
+                    sleep(1)
+                    # FINALIZAÇÃO DA FUNÇÃO
+                    print("\033[0;32mSeu produto foi adicionado ao carrinho!\033[m")
+                    confirmation = True
+                    sleep(1)
+                    print("\033[0;32mRetornando para o menu!\033[m")
+                    product_quantify_confirmation = True
+                    confirmation = True
+                    sleep(0.5)
+                    break
+                # QUANTIDADE DIGITADA INVÁLIDA
+                else:
+                    sleep(1)
+                    print("\033[0;31mQuantidade de produto inválida!\033[m")
+                    product_quantify_confirmation = False
