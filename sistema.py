@@ -71,7 +71,8 @@ def finalMenuOptions(id):
             sleep(1)
             print(f"\033[0;31mOpção inválida!\033[m")
             sleep(1)
-finalMenuOptions(id)
+if logged == True:
+    finalMenuOptions(id)
 # FINALIZAÇÃO DO SISTEMA ===========================================================================================
 sleep(0.5)
 print("="*66)
