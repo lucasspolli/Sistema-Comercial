@@ -36,7 +36,7 @@ git pull https://github.com/lucasspolli/Sistema-Comercial.git main
 4º Passo - Rode o projeto utilizando o seguinte comando:
 
 ```
-python src/app/sistema.py
+python src/app/main.py
 ```
 Pronto! Agora é só usufruir do sistema!
 #
