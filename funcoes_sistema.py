@@ -470,6 +470,7 @@ def payTheCart(id):
                 updateData(product, id)
                 print(f"\033[0;32mVocê pagou R${total:.2f} no débito!\033[m")
                 sleep(2)
+                optionConfirmation = True
                 break
             # PAGOU COM CRÉDTIO
             elif option == 2:
@@ -486,6 +487,7 @@ def payTheCart(id):
                         value = total / installments
                         print(f"\033[0;32mVocê irá pagar R${value:.2f} em {installments}x!\033[m")
                         sleep(2)
+                        optionConfirmation = True
                         break
             # RETORNANDO PARA O MENU
             elif option == 3:
