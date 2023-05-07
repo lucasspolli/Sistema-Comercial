@@ -5,7 +5,7 @@ from time import sleep
 # CONECTAR AO BANCO DE DADOS
 connection = sqlite3.connect('banco_de_dados.db')
 cursor = connection.cursor()
-# INÍCIO
+# INÍCIO ============================================================================================================
 def inicio():
     print("\n" * os.get_terminal_size().lines)
     sleep(1)
@@ -13,8 +13,8 @@ def inicio():
     print(f"\033[0;34m{'S I S T E M A':^66}\033[m")
     print(f"\033[0;34m{'C O M E R C I A L':^66}\033[m")
     print("="*66)
-# MENU INICIAL
-def Menu_inicial():
+# MENU INICIAL ======================================================================================================
+def initialMenu():
     inicio()
     sleep(0.5)
     print("\033[0;32mSeja bem vindo(a) ao maior sistema comercial da América Latina!\033[m")
@@ -29,79 +29,76 @@ def Menu_inicial():
     sleep(0.2)
     while True:
         try:
-            opcao = int(input("\033[0;33mEscolha uma das opções acima para continuar: \033[m"))
+            option = int(input("\033[0;33mEscolha uma das opções acima para continuar: \033[m"))
             break
         except ValueError:
             sleep(1)
             print(f"\033[0;31mDigite um número!\033[m")
-    return opcao
-# REGISTRAR CONTA ==================================================================================================
+    return option
+# RETORNANDO AO MENU ================================================================================================
+def returningToTheMenu():
+    sleep(1)
+    print("\033[0;32mRetornando ao menu!\033[m")
+    sleep(1)
+# REGISTRAR CONTA ===================================================================================================
 def Register():
     inicio()
     # CONFIRMAÇÃO DO NOME DO USUÁRIO
-    username_confirmation = False
+    usernameConfirmation = False
     sleep(0.5)
     print("\033[0;36mDigite 0 à qualquer momento para sair do cadastro!\033[m")
-    while username_confirmation == False:
+    while usernameConfirmation == False:
+        id = 0
         username = str(input("\033[0;33mDigite seu nome de usuário: \033[m"))
         # VERIFICA SE O USUÁRIO QUER SAIR
         if username == "0":
-            sleep(0.7)
-            print("\033[0;32mRetornando ao menu!\033[m")
-            sleep(0.7)
-            username_confirmation = True
+            returningToTheMenu()
+            usernameConfirmation = True
             logged = False
             break
         cursor.execute(f"SELECT * FROM clientes WHERE usuario = '{username}'")
         resultado = cursor.fetchall()
+        # USUÁRIO JÁ EXISTE
         if resultado != []:
-            sleep(1.2)
-            print("\033[0;31mEsse usuário já existe!\033[m")
-            username_confirmation = False
+            sleep(1)
+            print("\033[0;31mEsse usuário já foi cadastrado!\033[m")
+            usernameConfirmation = False
         else:
+            usernameConfirmation = True
             # CONFIRMAÇÃO DO EMAIL
-            email_confirmation = False
-            while email_confirmation == False:
+            emailConfirmation = False
+            while emailConfirmation == False:
                 sleep(1)
                 email = str(input("\033[0;33mDigite seu email: \033[m"))
                 # VERIFICA SE O USUÁRIO QUER SAIR
                 if email == "0":
-                    sleep(0.7)
-                    print("\033[0;32mRetornando ao menu!\033[m")
-                    sleep(0.7)
-                    username_confirmation = True
+                    returningToTheMenu()
                     logged = False
                     break
                 cursor.execute(f"SELECT * FROM clientes WHERE email = '{email}'")
                 resultado = cursor.fetchall()
+                # EMAIL JÁ FOI CADASTRADO
                 if resultado != []:
-                    sleep(1.2)
+                    sleep(1)
                     print("\033[0;31mEsse email já foi cadastrado!\033[m")
-                    email_confirmation = False
+                    emailConfirmation = False
                 else:
+                    emailConfirmation = True
                     # CONFIRMAÇÃO DA SENHA
-                    password_confirmation = False
-                    while password_confirmation == False:
+                    passwordConfirmation = False
+                    while passwordConfirmation == False:
                         sleep(1)
                         password = str(input("\033[0;33mDigite sua senha: \033[m"))
                         # VERIFICA SE O USUÁRIO QUER SAIR
                         if password == "0":
-                            sleep(0.7)
-                            print("\033[0;32mRetornando ao menu!\033[m")
-                            sleep(0.7)
-                            email_confirmation = True
-                            username_confirmation = True
+                            returningToTheMenu()
                             logged = False
                             break
                         sleep(1)
-                        password_confirm = str(input("\033[0;33mConfirme a sua senha: \033[m"))
+                        passwordConfirm = str(input("\033[0;33mConfirme a sua senha: \033[m"))
                         # VERIFICA SE O USUÁRIO QUER SAIR
-                        if password_confirm == "0":
-                            sleep(0.7)
-                            print("\033[0;32mRetornando ao menu!\033[m")
-                            sleep(0.7)
-                            email_confirmation = True
-                            username_confirmation = True
+                        if passwordConfirm == "0":
+                            returningToTheMenu()
                             logged = False
                             break
                         cursor.execute("SELECT * from clientes")
@@ -114,10 +111,10 @@ def Register():
                             for users in resultado:
                                 id = id + 1
                         # AS SENHAS ESTÃO INCORRETAS
-                        if password != password_confirm:
-                            sleep(1.2)
+                        if password != passwordConfirm:
+                            sleep(1)
                             print("\033[0;31mAs senhas não se coincidem!\033[m")
-                            password_confirmation = False
+                            passwordConfirmation = False
                         # ADICIONAR O USUÁRIO AO BANCO DE DADOS
                         else:
                             cursor.execute(f"INSERT INTO clientes (usuario, email, senha, id) VALUES('{username}', '{email}', '{password}', '{id}')")
@@ -131,49 +128,43 @@ def Register():
                             user = user.fetchall()
                             sleep(1.5)
                             print(f"\033[0;32mSeja bem-vindo, {user[0][0]}!\033[m")
-                            password_confirmation = True
-                            email_confirmation = True
-                            username_confirmation = True
+                            passwordConfirmation = True
                             logged = True
                             sleep(1)
     return logged, id
-# LOGAR NA CONTA ===================================================================================================
+# LOGAR NA CONTA ====================================================================================================
 def Login():
     inicio()
     # VERIFICAR SE EXISTE O NOME DE USUÁRIO OU EMAIL
     sleep(1)
     print("\033[0;36mDigite 0 à qualquer momento para sair do login!\033[m")
-    username_or_email_exists = False
-    while username_or_email_exists == False:
-        username_or_email = str(input("\033[0;33mDigite seu nome de usuário ou email: \033[m"))
+    usernameOrEmailExists = False
+    while usernameOrEmailExists == False:
+        usernameOrEmail = str(input("\033[0;33mDigite seu nome de usuário ou email: \033[m"))
         # VERIFICA SE O USUÁRIO QUER SAIR
-        if username_or_email == "0":
-            sleep(0.7)
-            print("\033[0;32mRetornando ao menu!\033[m")
-            sleep(0.7)
-            username_or_email_exists = True
+        if usernameOrEmail == "0":
+            returningToTheMenu()
+            usernameOrEmailExists = True
             logged = False
             break
-        user = cursor.execute(f"SELECT * FROM clientes WHERE usuario = '{username_or_email}' OR email = '{username_or_email}'")
+        user = cursor.execute(f"SELECT * FROM clientes WHERE usuario = '{usernameOrEmail}' OR email = '{usernameOrEmail}'")
         user = user.fetchall()
         # USUÁRIO OU EMAIL NÃO EXISTE
         if user == []:
             sleep(1)
             print("\033[0;31mEste usuário ou email não existe!\033[m")
-            username_or_email_exists = False
+            usernameOrEmailExists = False
         else:
+            usernameOrEmailExists = True
             # CONFIRMAÇÃO DA SENHA
-            password_confirmation = False
-            while password_confirmation == False:
+            passwordConfirmation = False
+            while passwordConfirmation == False:
                 sleep(1)
                 password = str(input("\033[0;33mDigite sua senha: \033[m"))
                 # VERIFICA SE O USUÁRIO QUER SAIR
                 if password == "0":
-                    sleep(0.7)
-                    print("\033[0;32mRetornando ao menu!\033[m")
-                    sleep(0.7)
-                    username_or_email_exists = True
-                    password_confirmation = True
+                    returningToTheMenu()
+                    passwordConfirmation = True
                     logged = False
                     break
                 user_password = user[0][2]
@@ -181,18 +172,17 @@ def Login():
                 if password != user_password:
                     sleep(1)
                     print("\033[0;31mA senha está incorreta!\033[m")
-                    password_confirmation = False
+                    passwordConfirmation = False
                 else:
                     # USUÁRIO ESTÁ LOGADO
                     sleep(1.5)
                     print(f"\033[0;32mSeja bem-vindo, {user[0][0]}!\033[m")
-                    password_confirmation = True
-                    username_or_email_exists = True
+                    passwordConfirmation = True
                     logged = True
                     sleep(1)
     return logged
-# MENU FINAL =======================================================================================================
-def Menu_final():
+# MENU FINAL ========================================================================================================
+def finalMenu():
     inicio()
     sleep(0.7)
     print("\033[0;33m1\033[m - Ver produtos cadastrados")
@@ -207,14 +197,14 @@ def Menu_final():
     sleep(0.4)
     while True:
         try:
-            opcao = int(input("\033[0;33mEscolha uma das opções acima para continuar: \033[m"))
+            option = int(input("\033[0;33mEscolha uma das opções acima para continuar: \033[m"))
             break
         except ValueError:
             sleep(1)
             print(f"\033[0;31mDigite um número!\033[m")
-    return opcao
-# PRODUTOS CADASTRADOS =============================================================================================
-def Registred_products():
+    return option
+# PRODUTOS CADASTRADOS ==============================================================================================
+def registredProducts():
     inicio()
     sleep(0.5)
     # LISTA DOS PRODUTOS CADASTRADOS NO BANCO DE DADOS
@@ -249,110 +239,99 @@ def Registred_products():
                 print("\033[0;32mRetornando para o menu!\033[m")
                 answer = True
                 sleep(0.5)
-# CADASTRAR PRODUTOS ===============================================================================================
-def Register_products():
+# CADASTRAR PRODUTOS ================================================================================================
+def registerProducts():
     inicio()
     cont = 0
-    admin_confirmation = False
-    while admin_confirmation == False:
+    adminConfirmation = False
+    while adminConfirmation == False:
         sleep(1)
-        admin_password = str(input("\033[0;33mDigite a senha de admin: \033[m"))
-        if admin_password != "9078":
+        adminPassword = str(input("\033[0;33mDigite a senha de admin: \033[m"))
+        if adminPassword != "9078":
             cont = cont + 1
             sleep(1)
             if cont == 3:
                 print("\033[0;31m3 tentativas erradas!\033[m")
-                admin_confirmation = True
+                adminConfirmation = True
                 break
             else:
                 print("\033[0;31mSenha de admin errada!\033[m")
-                admin_confirmation = False
+                adminConfirmation = False
         else:
+            adminConfirmation = True
             sleep(1)
             print("\033[0;36mDigite 0 à qualquer momento para sair do registro dos produtos!\033[m")
             # VERIFICAR O NOME DO PRODUTO
-            product_confirmation = False
-            while product_confirmation == False:
-                product_name = str(input("\033[0;33mDigite o nome do seu produto: \033[m"))
+            productConfirmation = False
+            while productConfirmation == False:
+                productName = str(input("\033[0;33mDigite o nome do seu produto: \033[m"))
                 # VERIFICA SE O USUÁRIO QUER SAIR
-                if product_name == "0":
-                    sleep(0.7)
-                    print("\033[0;32mRetornando ao menu!\033[m")
-                    sleep(0.7)
-                    product_confirmation = True
-                    admin_confirmation = True
+                if productName == "0":
+                    returningToTheMenu()
+                    productConfirmation = True
+                    adminConfirmation = True
                     break
-                product = cursor.execute(f"SELECT * FROM produtos WHERE nome = '{product_name}'")
+                product = cursor.execute(f"SELECT * FROM produtos WHERE nome = '{productName}'")
                 product = product.fetchall()
                 # REGISTRAR O PREÇO DO PRODUTO
                 if product == []:
+                    productConfirmation = True
                     priceConfirmation = False
                     while priceConfirmation == False:
                         sleep(1)
                         try:
-                            product_price = float(input("\033[0;33mDigite o preço do seu produto: \033[m"))
+                            productPrice = float(input("\033[0;33mDigite o preço do seu produto: \033[m"))
                             break
                         except ValueError:
                             sleep(1)
                             print("\033[0;31mDigite somente os números do preço ou digite com '.' os centavos!\033[m")
                             priceConfirmation = False
                     # VERIFICA SE O USUÁRIO QUER SAIR
-                    if product_price == "0":
-                        sleep(0.7)
-                        print("\033[0;32mRetornando ao menu!\033[m")
-                        sleep(0.7)
+                    if productPrice == "0":
+                        returningToTheMenu()
                         priceConfirmation = True
-                        product_confirmation = True
-                        admin_confirmation = True
                         break
                     quantifyConfirmation = False
                     while quantifyConfirmation == False:
                         sleep(1)
                         try:
-                            product_quantify = int(input("\033[0;33mDigite a quantidade do seu produto que tem em estoque: \033[m"))
+                            productQuantify = int(input("\033[0;33mDigite a quantidade do seu produto que tem em estoque: \033[m"))
                             break
                         except ValueError:
                             sleep(1)
                             print("\033[0;31mDigite somente valores inteiros!\033[m")
                             quantifyConfirmation = False
                     # VERIFICA SE O USUÁRIO QUER SAIR
-                    if product_quantify == "0":
-                        sleep(0.7)
-                        print("\033[0;32mRetornando ao menu!\033[m")
-                        sleep(0.7)
+                    if productQuantify == "0":
+                        returningToTheMenu()
                         priceConfirmation = True
-                        product_confirmation = True
-                        admin_confirmation = True
                         break
                     # SELECIONAR OS PRODUTOS NO BANCO DE DADOS
                     product = cursor.execute(f"SELECT * FROM produtos")
                     product = product.fetchall()
                     # DEFINIR O ID DO PRODUTO
-                    product_id = 0
+                    productsId = 0
                     if product == []:
                         pass
                     else:
-                        for products_id in product:
-                            product_id = product_id + 1
+                        for productsId in product:
+                            productsId += 1
                     # ADICIONAR O PRODUTO À TABELA PRODUTOS NO BANCO DE DADOS
-                    comand = f"INSERT INTO produtos (nome, preço, quantidade, id) VALUES('{product_name}', '{product_price}', '{product_quantify}', '{product_id}')"
-                    cursor.execute(comand)
+                    cursor.execute(f"INSERT INTO produtos (nome, preço, quantidade, id) VALUES('{productName}', '{productPrice}', '{productQuantify}', '{productsId}')")
                     connection.commit()
                     sleep(1)
                     # FINALIZAÇÃO DA FUNÇÃO
                     print("\033[0;32mSeu produto foi adicionado ao sistema!\033[m")
                     priceConfirmation = True
-                    product_confirmation = True
-                    admin_confirmation = True
                     sleep(1)
                     break
                 # JÁ EXISTE UM PRODUTO COM O NOME DIGITADO
-                elif product_name == product[0][0]:
+                elif productName == product[0][0]:
                     sleep(1)
                     print("\033[0;31mEste nome de produto já existe!\033[m")
-                    product_confirmation = False
-# COMPRAR PRODUTOS =================================================================================================
-def Buy_product(id):
+                    productConfirmation = False
+# COMPRAR PRODUTOS ==================================================================================================
+def buyProduct(id):
     inicio()
     # LISTA DOS PRODUTOS CADASTRADOS NO BANCO DE DADOS
     sleep(0.5)
@@ -381,6 +360,7 @@ def Buy_product(id):
             print("\033[0;31mEste ID de produto não existe!\033[m")
             confirmation = False
         else:
+            confirmation = True
             # ID EXISTE NO BANCO DE DADOS
             if productId == product[0][3]:
                 sleep(1)
@@ -388,7 +368,7 @@ def Buy_product(id):
                 sleep(0.5)
                 print("\033[0;33mO produto escolhido foi:\033[m")
                 sleep(0.5)
-                print(f"\033[0;32m{product[0][0]} que custa R${float(product[0][1]):.2f} com {product[0][2]} quantidades em estoque e seu ID é {product[0][3]}\033[m")
+                print(f"\033[0;36m{product[0][0]} que custa R${float(product[0][1]):.2f} com {product[0][2]} quantidades em estoque e seu ID é {product[0][3]}.\033[m")
                 # CONFIRMAR A QUANTIDADE QUE O USUÁRIO QUE COMPRAR
                 productQuantifyConfirmation = False
                 while productQuantifyConfirmation == False:
@@ -396,16 +376,15 @@ def Buy_product(id):
                     productQuantify = str(input("\033[0;33mDigite a quantidade que deseja comprar: \033[m"))
                     productQuantify = int(productQuantify)
                     if productInCart == []:
-                        product_quantify_avaiable = int(product[0][2])
+                        productQuantifyAvaiable = int(product[0][2])
                         # QUANTIDADE ESTÁ DENTRO DAS REGRAS
-                        if (productQuantify <= product_quantify_avaiable) and (productQuantify > 0):
+                        if (productQuantify <= productQuantifyAvaiable) and (productQuantify > 0):
                             # ADICIONAR O PRODUTO AO CARRINHO DO USUÁRIO
                             cursor.execute(f"INSERT INTO '{id}' (nome, preço, quantidade, id) VALUES('{product[0][0]}', '{product[0][1]}', '{productQuantify}', '{product[0][3]}')")
                             connection.commit()
-                            sleep(1)
+                            sleep(1.5)
                             print("\033[0;32mSeu produto foi adicionado ao carrinho!\033[m")
                             sleep(1)
-                            confirmation = True
                             productQuantifyConfirmation = True
                         # QUANTIDADE DIGITADA INVÁLIDA
                         else:
@@ -421,10 +400,9 @@ def Buy_product(id):
                         sleep(2)
                         print(f"\033[0;32mMais {productQuantify} {productInCart[0][0]} foi adicionado ao carrinho!\033[m")
                         sleep(2)
-                        confirmation = True
                         break
 # MENU PAGAMENTO ====================================================================================================
-def Menu_pagamento():
+def paymentMenu():
     print("="*66)
     sleep(0.2)
     print("\033[0;33m1\033[m - Pagar no débito")
@@ -435,14 +413,24 @@ def Menu_pagamento():
     sleep(0.2)
     while True:
         try:
-            opcao = int(input("\033[0;33mComo você deseja pagar a sua conta? \033[m"))
+            option = int(input("\033[0;33mComo você deseja pagar a sua conta? \033[m"))
             break
         except ValueError:
             sleep(1)
             print(f"\033[0;31mDigite um número!\033[m")
-    return opcao
+    return option
+# ATUALIZAR DADOS DOS PRODUTOS NO BANCO DE DADOS ====================================================================
+def updateData(product, id):
+    cursor.execute(f"DELETE FROM '{id}'")
+    for products in product:
+        productInDatabase = cursor.execute(f"SELECT * FROM produtos WHERE id = '{products[3]}'")
+        productInDatabase = productInDatabase.fetchall()
+        productQuantify = int(productInDatabase[0][2]) - int(products[2])
+        cursor.execute(f"UPDATE produtos SET quantidade = '{productQuantify}' WHERE id = '{products[3]}'")
+        connection.commit()
+    sleep(1.5)
 # PAGAR CARRINHO ====================================================================================================
-def Pay_cart(id):
+def payTheCart(id):
     inicio()
     answerConfirmation = False
     while answerConfirmation == False:
@@ -474,52 +462,39 @@ def Pay_cart(id):
         print(f"\033[0;32mO valor total do seu carrinho é R${total:.2f}\033[m")
         sleep(1)
         # PAGAMENTO
-        opcaoConfirmation = False
-        while opcaoConfirmation == False:
-            opcao = Menu_pagamento()
+        optionConfirmation = False
+        while optionConfirmation == False:
+            option = paymentMenu()
             # PAGOU COM DÉBITO
-            if opcao == 1:
-                sleep(1.5)
+            if option == 1:
+                updateData(product, id)
                 print(f"\033[0;32mVocê pagou R${total:.2f} no débito!\033[m")
                 sleep(2)
-                cursor.execute(f"DELETE FROM '{id}'")
-                productInDatabase = cursor.execute(f"SELECT * FROM produtos WHERE id = '{product[0][3]}'")
-                productInDatabase = productInDatabase.fetchall()
-                productQuantify = int(productInDatabase[0][2]) - int(product[0][2])
-                cursor.execute(f"UPDATE produtos SET quantidade = '{productQuantify}' WHERE id = '{product[0][3]}'")
-                connection.commit()
                 break
             # PAGOU COM CRÉDTIO
-            elif opcao == 2:
+            elif option == 2:
                 installmentsConfirmation = False
                 while installmentsConfirmation == False:
                     sleep(1)
-                    parcelas = int(input(f"\033[0;33mEm quantas parcelas deseja pagar? \033[m"))
-                    if parcelas > 12:
+                    installments = int(input(f"\033[0;33mEm quantas parcelas deseja pagar? \033[m"))
+                    if installments > 12:
                         sleep(1)
                         print("\033[0;31mQuantidade de parcelas maior que 12!\033[m")
                         installmentsConfirmation = False
                     else:
-                        value = total / parcelas
-                        sleep(1.5)
-                        print(f"\033[0;32mVocê irá pagar R${value:.2f} em {parcelas}x!\033[m")
+                        updateData(product, id)
+                        value = total / installments
+                        print(f"\033[0;32mVocê irá pagar R${value:.2f} em {installments}x!\033[m")
                         sleep(2)
-                        cursor.execute(f"DELETE FROM '{id}'")
-                        productInDatabase = cursor.execute(f"SELECT * FROM produtos WHERE id = '{product[0][3]}'")
-                        productInDatabase = productInDatabase.fetchall()
-                        productQuantify = int(productInDatabase[0][2]) - int(product[0][2])
-                        cursor.execute(f"UPDATE produtos SET quantidade = '{productQuantify}' WHERE id = '{product[0][3]}'")
-                        connection.commit()
                         break
             # RETORNANDO PARA O MENU
-            elif opcao == 3:
-                sleep(1)
-                print("\033[0;32mRetornando para o menu!\033[m")
-                sleep(0.5)
+            elif option == 3:
+                returningToTheMenu()
                 break
             # OPÇÃO INVÁLIDA
             else:
                 sleep(1)
                 print("\033[0;31mOpção inválida!\033[m")
-                opcaoConfirmation = False
+                sleep(1)
+                optionConfirmation = False
         answerConfirmation = True

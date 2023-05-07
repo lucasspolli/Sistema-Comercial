@@ -22,19 +22,19 @@ def create_registred_products_table():
 # CRIAR A TABELA CLIENTES E PRODUTOS
 create_clients_table(), create_registred_products_table()
 # MENU INICIAL COM ESCOLHA DO USUÁRIO ==============================================================================
-def menu_inicial():
+def initialMenuOptions():
     logged = False
     id = 0
     while logged == False:
         sleep(0.5)
-        botaoFinal = Menu_inicial()
-        if botaoFinal == 1:
+        initialButton = initialMenu()
+        if initialButton == 1:
             sleep(1)
             logged, id = Register()
-        elif botaoFinal == 2:
+        elif initialButton == 2:
             sleep(1)
             logged = Login()
-        elif botaoFinal == 3:
+        elif initialButton == 3:
             connection.close()
             break
         else:
@@ -42,27 +42,27 @@ def menu_inicial():
             print(f"\033[0;31mOpção inválida!\033[m")
             sleep(1)
     return logged, id
-logged, id = menu_inicial()
+logged, id = initialMenuOptions()
 # MENU FINAL COM ESCOLHA DO USUÁRIO =================================================================================
-def menu_final(id):
+def finalMenuOptions(id):
     logged = True
     while logged == True:
         sleep(0.5)
-        botaoFinal = Menu_final()
-        if botaoFinal == 1:
+        finalButton = finalMenu()
+        if finalButton == 1:
             sleep(0.5)
-            Registred_products()
-        elif botaoFinal == 2:
+            registredProducts()
+        elif finalButton == 2:
             sleep(0.5)
-            Register_products()
-        elif botaoFinal == 3:
+            registerProducts()
+        elif finalButton == 3:
             sleep(0.5)
-            Buy_product(id)
-        elif botaoFinal == 4:
+            buyProduct(id)
+        elif finalButton == 4:
             sleep(0.5)
-            Pay_cart(id)
-        elif botaoFinal == 5:
-            logged = menu_inicial()
+            payTheCart(id)
+        elif finalButton == 5:
+            logged = initialMenuOptions()
             if logged == True:
                 continue
             else:
@@ -71,7 +71,7 @@ def menu_final(id):
             sleep(1)
             print(f"\033[0;31mOpção inválida!\033[m")
             sleep(1)
-menu_final(id)
+finalMenuOptions(id)
 # FINALIZAÇÃO DO SISTEMA ===========================================================================================
 sleep(0.5)
 print("="*66)
