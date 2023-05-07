@@ -27,14 +27,14 @@ def menu_inicial():
     id = 0
     while logged == False:
         sleep(0.5)
-        botao_final = Menu_inicial()
-        if botao_final == 1:
+        botaoFinal = Menu_inicial()
+        if botaoFinal == 1:
             sleep(1)
             logged, id = Register()
-        elif botao_final == 2:
+        elif botaoFinal == 2:
             sleep(1)
             logged = Login()
-        elif botao_final == 3:
+        elif botaoFinal == 3:
             connection.close()
             break
         else:
@@ -43,22 +43,25 @@ def menu_inicial():
             sleep(1)
     return logged, id
 logged, id = menu_inicial()
-# MENU FINAL COM ESCOLHA DO USUÁRIO ================================================================================
+# MENU FINAL COM ESCOLHA DO USUÁRIO =================================================================================
 def menu_final(id):
     logged = True
     while logged == True:
         sleep(0.5)
-        botao_final = Menu_final()
-        if botao_final == 1:
+        botaoFinal = Menu_final()
+        if botaoFinal == 1:
             sleep(0.5)
             Registred_products()
-        elif botao_final == 2:
+        elif botaoFinal == 2:
             sleep(0.5)
             Register_products()
-        elif botao_final == 3:
+        elif botaoFinal == 3:
             sleep(0.5)
             Buy_product(id)
-        elif botao_final == 4:
+        elif botaoFinal == 4:
+            sleep(0.5)
+            Pay_cart(id)
+        elif botaoFinal == 5:
             logged = menu_inicial()
             if logged == True:
                 continue

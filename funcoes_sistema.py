@@ -201,7 +201,9 @@ def Menu_final():
     sleep(0.4)
     print("\033[0;33m3\033[m - Comprar um produto")
     sleep(0.4)
-    print("\033[0;33m4\033[m - Sair da conta")
+    print("\033[0;33m4\033[m - Pagar carrinho")
+    sleep(0.4)
+    print("\033[0;33m5\033[m - Sair da conta")
     sleep(0.4)
     while True:
         try:
@@ -222,74 +224,105 @@ def Registred_products():
     # SELECIONAR OS PRODUTOS NO BANCO DE DADOS
     product = cursor.execute(f"SELECT * FROM produtos")
     product = product.fetchall()
-    # MOSTRAR AS INFORMAÇÕES DE TODOS OS PRODUTOS REGISTRADOS
-    for products in product:
-        sleep(0.3)
-        print(f"{products[0]:<22}R${float(products[1]):<15.2f}{products[2]:<12}{products[3]}")
-    # ESPERANDO RESPOSTA DO USUÁRIO PARA VOLTAR AO MENU
-    answer = False
-    while answer == False:
-        sleep(0.5)
-        answer = str(input("\033[0;33mDigite \033[0;36mvoltar\033[m \033[0;33mpara retornar ao menu: \033[m"))
-        # RESPOSTA INVÁLIDA
-        if answer != "voltar":
-            sleep(1)
-            print("\033[0;31mResposta inválida!\033[m")
-            answer = False
-        # RETORNANDO PARA O MENU
-        else:
-            sleep(1)
-            print("\033[0;32mRetornando para o menu!\033[m")
-            answer = True
+    if product == []:
+        sleep(1)
+        print("\033[0;31mNo momento ainda não temos produtos em estoque!\033[m")
+        sleep(2)
+    else:
+        # MOSTRAR AS INFORMAÇÕES DE TODOS OS PRODUTOS REGISTRADOS
+        for products in product:
+            sleep(0.3)
+            print(f"{products[0]:<22}R${float(products[1]):<15.2f}{products[2]:<12}{products[3]}")
+        # ESPERANDO RESPOSTA DO USUÁRIO PARA VOLTAR AO MENU
+        answer = False
+        while answer == False:
             sleep(0.5)
+            answer = str(input("\033[0;33mDigite \033[0;36mvoltar\033[m \033[0;33mpara retornar ao menu: \033[m"))
+            # RESPOSTA INVÁLIDA
+            if answer != "voltar":
+                sleep(1)
+                print("\033[0;31mResposta inválida!\033[m")
+                answer = False
+            # RETORNANDO PARA O MENU
+            else:
+                sleep(1)
+                print("\033[0;32mRetornando para o menu!\033[m")
+                answer = True
+                sleep(0.5)
 # CADASTRAR PRODUTOS ===============================================================================================
 def Register_products():
     inicio()
-    sleep(1)
-    print("\033[0;36mDigite 0 à qualquer momento para sair do registro dos produtos!\033[m")
-    # VERIFICAR O NOME DO PRODUTO
-    product_confirmation = False
-    while product_confirmation == False:
-        product_name = str(input("\033[0;33mDigite o nome do seu produto: \033[m"))
-        # VERIFICA SE O USUÁRIO QUER SAIR
-        if product_name == "0":
-            sleep(0.7)
-            print("\033[0;32mRetornando ao menu!\033[m")
-            sleep(0.7)
-            product_confirmation = True
-            break
-        product = cursor.execute(f"SELECT * FROM produtos WHERE nome = '{product_name}'")
-        product = product.fetchall()
-        # REGISTRAR O PREÇO DO PRODUTO
-        if product == []:
-            price_confirmation = False
-            while price_confirmation == False:
-                sleep(1)
-                product_price = str(input("\033[0;33mDigite o preço do seu produto: \033[m"))
-                if "." in product_price:
-                    sleep(1)
-                    print("\033[0;31mDigite somente os números do preço!\033[m")
-                    price_confirmation = False
-                else:
-                    # SUBSTITUIR A VÍRGULA PELO PONTO NO PREÇO
-                    product_price = product_price.replace(",", ".")
+    cont = 0
+    admin_confirmation = False
+    while admin_confirmation == False:
+        sleep(1)
+        admin_password = str(input("\033[0;33mDigite a senha de admin: \033[m"))
+        if admin_password != "9078":
+            cont = cont + 1
+            sleep(1)
+            if cont == 3:
+                print("\033[0;31m3 tentativas erradas!\033[m")
+                admin_confirmation = True
+                break
+            else:
+                print("\033[0;31mSenha de admin errada!\033[m")
+                admin_confirmation = False
+        else:
+            sleep(1)
+            print("\033[0;36mDigite 0 à qualquer momento para sair do registro dos produtos!\033[m")
+            # VERIFICAR O NOME DO PRODUTO
+            product_confirmation = False
+            while product_confirmation == False:
+                product_name = str(input("\033[0;33mDigite o nome do seu produto: \033[m"))
+                # VERIFICA SE O USUÁRIO QUER SAIR
+                if product_name == "0":
+                    sleep(0.7)
+                    print("\033[0;32mRetornando ao menu!\033[m")
+                    sleep(0.7)
+                    product_confirmation = True
+                    admin_confirmation = True
+                    break
+                product = cursor.execute(f"SELECT * FROM produtos WHERE nome = '{product_name}'")
+                product = product.fetchall()
+                # REGISTRAR O PREÇO DO PRODUTO
+                if product == []:
+                    priceConfirmation = False
+                    while priceConfirmation == False:
+                        sleep(1)
+                        try:
+                            product_price = float(input("\033[0;33mDigite o preço do seu produto: \033[m"))
+                            break
+                        except ValueError:
+                            sleep(1)
+                            print("\033[0;31mDigite somente os números do preço ou digite com '.' os centavos!\033[m")
+                            priceConfirmation = False
                     # VERIFICA SE O USUÁRIO QUER SAIR
                     if product_price == "0":
                         sleep(0.7)
                         print("\033[0;32mRetornando ao menu!\033[m")
                         sleep(0.7)
-                        price_confirmation = True
+                        priceConfirmation = True
                         product_confirmation = True
+                        admin_confirmation = True
                         break
-                    sleep(1)
-                    product_quantify = str(input("\033[0;33mDigite a quantidade do seu produto que tem em estoque: \033[m"))
+                    quantifyConfirmation = False
+                    while quantifyConfirmation == False:
+                        sleep(1)
+                        try:
+                            product_quantify = int(input("\033[0;33mDigite a quantidade do seu produto que tem em estoque: \033[m"))
+                            break
+                        except ValueError:
+                            sleep(1)
+                            print("\033[0;31mDigite somente valores inteiros!\033[m")
+                            quantifyConfirmation = False
                     # VERIFICA SE O USUÁRIO QUER SAIR
                     if product_quantify == "0":
                         sleep(0.7)
                         print("\033[0;32mRetornando ao menu!\033[m")
                         sleep(0.7)
-                        price_confirmation = True
+                        priceConfirmation = True
                         product_confirmation = True
+                        admin_confirmation = True
                         break
                     # SELECIONAR OS PRODUTOS NO BANCO DE DADOS
                     product = cursor.execute(f"SELECT * FROM produtos")
@@ -308,15 +341,16 @@ def Register_products():
                     sleep(1)
                     # FINALIZAÇÃO DA FUNÇÃO
                     print("\033[0;32mSeu produto foi adicionado ao sistema!\033[m")
-                    price_confirmation = True
+                    priceConfirmation = True
                     product_confirmation = True
+                    admin_confirmation = True
                     sleep(1)
                     break
-        # JÁ EXISTE UM PRODUTO COM O NOME DIGITADO
-        elif product_name == product[0][0]:
-            sleep(1)
-            print("\033[0;31mEste nome de produto já existe!\033[m")
-            product_confirmation = False
+                # JÁ EXISTE UM PRODUTO COM O NOME DIGITADO
+                elif product_name == product[0][0]:
+                    sleep(1)
+                    print("\033[0;31mEste nome de produto já existe!\033[m")
+                    product_confirmation = False
 # COMPRAR PRODUTOS =================================================================================================
 def Buy_product(id):
     inicio()
@@ -336,46 +370,156 @@ def Buy_product(id):
     confirmation = False
     while confirmation == False:
         sleep(0.5)
-        product_id = str(input("\033[0;33mDigite o ID do produto que deseja comprar: \033[m"))
-        product = cursor.execute(f"SELECT * FROM produtos WHERE id = '{product_id}'")
+        productId = str(input("\033[0;33mDigite o ID do produto que deseja comprar: \033[m"))
+        product = cursor.execute(f"SELECT * FROM produtos WHERE id = '{productId}'")
         product = product.fetchall()
+        productInCart = cursor.execute(f"SELECT * FROM '{id}' WHERE id = '{productId}'")
+        productInCart = productInCart.fetchall()
         # ID DIGITADO NÃO EXISTE
         if product == []:
             sleep(1)
             print("\033[0;31mEste ID de produto não existe!\033[m")
             confirmation = False
-        # ID EXISTE NO BANCO DE DADOS
-        elif product_id == product[0][3]:
-            sleep(1)
-            inicio()
-            sleep(0.5)
-            print("\033[0;33mO produto escolhido foi:\033[m")
-            sleep(0.5)
-            print(f"\033[0;32m{product[0][0]} que custa R${product[0][1]} com {product[0][2]} quantidades em estoque e seu ID é {product[0][3]}\033[m")
-            # CONFIRMAR A QUANTIDADE QUE O USUÁRIO QUE COMPRAR
-            product_quantify_confirmation = False
-            while product_quantify_confirmation == False:
+        else:
+            # ID EXISTE NO BANCO DE DADOS
+            if productId == product[0][3]:
                 sleep(1)
-                product_quantify = str(input("\033[0;33mDigite a quantidade que deseja comprar: \033[m"))
-                product_quantify = int(product_quantify)
-                product_quantify_avaiable = int(product[0][2])
-                # QUANTIDADE ESTÁ DENTRO DAS REGRAS
-                if (product_quantify <= product_quantify_avaiable) and (product_quantify > 0):
-                    # ADICIONAR O PRODUTO AO CARRINHO DO USUÁRIO
-                    cursor.execute(f"INSERT INTO '{id}' (nome, preço, quantidade, id) VALUES('{product[0][0]}', '{product[0][1]}', '{product_quantify}', '{product[0][3]}')")
-                    connection.commit()
+                inicio()
+                sleep(0.5)
+                print("\033[0;33mO produto escolhido foi:\033[m")
+                sleep(0.5)
+                print(f"\033[0;32m{product[0][0]} que custa R${float(product[0][1]):.2f} com {product[0][2]} quantidades em estoque e seu ID é {product[0][3]}\033[m")
+                # CONFIRMAR A QUANTIDADE QUE O USUÁRIO QUE COMPRAR
+                productQuantifyConfirmation = False
+                while productQuantifyConfirmation == False:
                     sleep(1)
-                    # FINALIZAÇÃO DA FUNÇÃO
-                    print("\033[0;32mSeu produto foi adicionado ao carrinho!\033[m")
-                    confirmation = True
+                    productQuantify = str(input("\033[0;33mDigite a quantidade que deseja comprar: \033[m"))
+                    productQuantify = int(productQuantify)
+                    if productInCart == []:
+                        product_quantify_avaiable = int(product[0][2])
+                        # QUANTIDADE ESTÁ DENTRO DAS REGRAS
+                        if (productQuantify <= product_quantify_avaiable) and (productQuantify > 0):
+                            # ADICIONAR O PRODUTO AO CARRINHO DO USUÁRIO
+                            cursor.execute(f"INSERT INTO '{id}' (nome, preço, quantidade, id) VALUES('{product[0][0]}', '{product[0][1]}', '{productQuantify}', '{product[0][3]}')")
+                            connection.commit()
+                            sleep(1)
+                            print("\033[0;32mSeu produto foi adicionado ao carrinho!\033[m")
+                            sleep(1)
+                            confirmation = True
+                            productQuantifyConfirmation = True
+                        # QUANTIDADE DIGITADA INVÁLIDA
+                        else:
+                            sleep(1)
+                            print("\033[0;31mQuantidade de produto inválida!\033[m")
+                            productQuantifyConfirmation = False
+                    # SE JÁ EXISTIR O PRODUTO NO CARRINHO
+                    else:
+                        # ADICIONAR MAIS UM PRODUTO AO CARRINHO DO USUÁRIO
+                        productQuantifyToAdd = (int(productInCart[0][2]) + productQuantify)
+                        cursor.execute(f"UPDATE '{id}' SET quantidade = '{productQuantifyToAdd}' WHERE id = '{product[0][3]}'")
+                        connection.commit()
+                        sleep(2)
+                        print(f"\033[0;32mMais {productQuantify} {productInCart[0][0]} foi adicionado ao carrinho!\033[m")
+                        sleep(2)
+                        confirmation = True
+                        break
+# MENU PAGAMENTO ====================================================================================================
+def Menu_pagamento():
+    print("="*66)
+    sleep(0.2)
+    print("\033[0;33m1\033[m - Pagar no débito")
+    sleep(0.2)
+    print("\033[0;33m2\033[m - Pagar no crédito")
+    sleep(0.2)
+    print("\033[0;33m3\033[m - Sair do menu")
+    sleep(0.2)
+    while True:
+        try:
+            opcao = int(input("\033[0;33mComo você deseja pagar a sua conta? \033[m"))
+            break
+        except ValueError:
+            sleep(1)
+            print(f"\033[0;31mDigite um número!\033[m")
+    return opcao
+# PAGAR CARRINHO ====================================================================================================
+def Pay_cart(id):
+    inicio()
+    answerConfirmation = False
+    while answerConfirmation == False:
+        sleep(1)
+        # LISTA DOS PRODUTOS NO CARRINHO
+        print("\033[0;32mAqui está a lista dos produtos do seu carrinho:\033[m")
+        sleep(0.5)
+        print(f"\033[0;33m{'Nome':<24}{'Preço':<12}{'Quantidade':<15}{'ID'}\033[m")
+        # SELECIONAR OS PRODUTOS NO BANCO DE DADOS
+        product = cursor.execute(f"SELECT * FROM '{id}'")
+        product = product.fetchall()
+        if product == []:
+            sleep(1)
+            print(f"\033[0;32mVocê não tem produtos no carrinho!\033[m")
+            sleep(2)
+            answerConfirmation = True
+            break
+        # MOSTRAR AS INFORMAÇÕES DE TODOS OS PRODUTOS REGISTRADOS
+        total = 0
+        for products in product:
+            sleep(0.3)
+            print(f"{products[0]:<22}R${float(products[1]):<15.2f}{products[2]:<12}{products[3]}")
+            if products[2] == 1:
+                total = total + float(products[1])
+            else:
+                total = total + (float(products[1]) * int(products[2]))
+        # VALOR TOTAL DO CARRINHO
+        sleep(1)
+        print(f"\033[0;32mO valor total do seu carrinho é R${total:.2f}\033[m")
+        sleep(1)
+        # PAGAMENTO
+        opcaoConfirmation = False
+        while opcaoConfirmation == False:
+            opcao = Menu_pagamento()
+            # PAGOU COM DÉBITO
+            if opcao == 1:
+                sleep(1.5)
+                print(f"\033[0;32mVocê pagou R${total:.2f} no débito!\033[m")
+                sleep(2)
+                cursor.execute(f"DELETE FROM '{id}'")
+                productInDatabase = cursor.execute(f"SELECT * FROM produtos WHERE id = '{product[0][3]}'")
+                productInDatabase = productInDatabase.fetchall()
+                productQuantify = int(productInDatabase[0][2]) - int(product[0][2])
+                cursor.execute(f"UPDATE produtos SET quantidade = '{productQuantify}' WHERE id = '{product[0][3]}'")
+                connection.commit()
+                break
+            # PAGOU COM CRÉDTIO
+            elif opcao == 2:
+                installmentsConfirmation = False
+                while installmentsConfirmation == False:
                     sleep(1)
-                    print("\033[0;32mRetornando para o menu!\033[m")
-                    product_quantify_confirmation = True
-                    confirmation = True
-                    sleep(0.5)
-                    break
-                # QUANTIDADE DIGITADA INVÁLIDA
-                else:
-                    sleep(1)
-                    print("\033[0;31mQuantidade de produto inválida!\033[m")
-                    product_quantify_confirmation = False
+                    parcelas = int(input(f"\033[0;33mEm quantas parcelas deseja pagar? \033[m"))
+                    if parcelas > 12:
+                        sleep(1)
+                        print("\033[0;31mQuantidade de parcelas maior que 12!\033[m")
+                        installmentsConfirmation = False
+                    else:
+                        value = total / parcelas
+                        sleep(1.5)
+                        print(f"\033[0;32mVocê irá pagar R${value:.2f} em {parcelas}x!\033[m")
+                        sleep(2)
+                        cursor.execute(f"DELETE FROM '{id}'")
+                        productInDatabase = cursor.execute(f"SELECT * FROM produtos WHERE id = '{product[0][3]}'")
+                        productInDatabase = productInDatabase.fetchall()
+                        productQuantify = int(productInDatabase[0][2]) - int(product[0][2])
+                        cursor.execute(f"UPDATE produtos SET quantidade = '{productQuantify}' WHERE id = '{product[0][3]}'")
+                        connection.commit()
+                        break
+            # RETORNANDO PARA O MENU
+            elif opcao == 3:
+                sleep(1)
+                print("\033[0;32mRetornando para o menu!\033[m")
+                sleep(0.5)
+                break
+            # OPÇÃO INVÁLIDA
+            else:
+                sleep(1)
+                print("\033[0;31mOpção inválida!\033[m")
+                opcaoConfirmation = False
+        answerConfirmation = True
