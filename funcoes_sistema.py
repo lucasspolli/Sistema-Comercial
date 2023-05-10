@@ -36,150 +36,142 @@ def initialMenu():
             print(f"\033[0;31mDigite um número!\033[m")
     return option
 # RETORNANDO AO MENU ================================================================================================
-def returningToTheMenu():
+def printReturningToMenu():
     sleep(1)
     print("\033[0;32mRetornando ao menu!\033[m")
     sleep(1)
 # REGISTRAR CONTA ===================================================================================================
 def Register():
+    id = 0
+    logged = False
     inicio()
     # CONFIRMAÇÃO DO NOME DO USUÁRIO
     usernameConfirmation = False
     sleep(0.5)
     print("\033[0;36mDigite 0 à qualquer momento para sair do cadastro!\033[m")
     while usernameConfirmation == False:
-        id = 0
         username = str(input("\033[0;33mDigite seu nome de usuário: \033[m"))
         # VERIFICA SE O USUÁRIO QUER SAIR
         if username == "0":
-            returningToTheMenu()
-            usernameConfirmation = True
-            logged = False
-            break
+            printReturningToMenu()
+            return logged, id
         cursor.execute(f"SELECT * FROM clientes WHERE usuario = '{username}'")
         resultado = cursor.fetchall()
         # USUÁRIO JÁ EXISTE
         if resultado != []:
             sleep(1)
             print("\033[0;31mEsse usuário já foi cadastrado!\033[m")
-            usernameConfirmation = False
         else:
-            usernameConfirmation = True
-            # CONFIRMAÇÃO DO EMAIL
-            emailConfirmation = False
-            while emailConfirmation == False:
-                sleep(1)
-                email = str(input("\033[0;33mDigite seu email: \033[m"))
-                # VERIFICA SE O USUÁRIO QUER SAIR
-                if email == "0":
-                    returningToTheMenu()
-                    logged = False
-                    break
-                cursor.execute(f"SELECT * FROM clientes WHERE email = '{email}'")
-                resultado = cursor.fetchall()
-                # EMAIL JÁ FOI CADASTRADO
-                if resultado != []:
-                    sleep(1)
-                    print("\033[0;31mEsse email já foi cadastrado!\033[m")
-                    emailConfirmation = False
-                else:
-                    emailConfirmation = True
-                    # CONFIRMAÇÃO DA SENHA
-                    passwordConfirmation = False
-                    while passwordConfirmation == False:
-                        sleep(1)
-                        password = str(input("\033[0;33mDigite sua senha: \033[m"))
-                        # VERIFICA SE O USUÁRIO QUER SAIR
-                        if password == "0":
-                            returningToTheMenu()
-                            logged = False
-                            break
-                        sleep(1)
-                        passwordConfirm = str(input("\033[0;33mConfirme a sua senha: \033[m"))
-                        # VERIFICA SE O USUÁRIO QUER SAIR
-                        if passwordConfirm == "0":
-                            returningToTheMenu()
-                            logged = False
-                            break
-                        cursor.execute("SELECT * from clientes")
-                        resultado = cursor.fetchall()
-                        # DEFINIR O ID DO USUÁRIO
-                        if resultado == []:
-                            id = 0
-                        else:
-                            id = 0
-                            for users in resultado:
-                                id = id + 1
-                        # AS SENHAS ESTÃO INCORRETAS
-                        if password != passwordConfirm:
-                            sleep(1)
-                            print("\033[0;31mAs senhas não se coincidem!\033[m")
-                            passwordConfirmation = False
-                        # ADICIONAR O USUÁRIO AO BANCO DE DADOS
-                        else:
-                            cursor.execute(f"INSERT INTO clientes (usuario, email, senha, id) VALUES('{username}', '{email}', '{password}', '{id}')")
-                            cursor.execute(f'''CREATE TABLE IF NOT EXISTS '{id}' (
-                                                nome varchar(1),
-                                                preço varchar(1),
-                                                quantidade varchar(1),
-                                                id varchar(1))''')
-                            connection.commit()
-                            user = cursor.execute(f"SELECT * FROM clientes WHERE usuario = '{username}' OR email = '{email}'")
-                            user = user.fetchall()
-                            sleep(1.5)
-                            print(f"\033[0;32mSeja bem-vindo, {user[0][0]}!\033[m")
-                            passwordConfirmation = True
-                            logged = True
-                            sleep(1)
+           break
+    # CONFIRMAÇÃO DO EMAIL
+    emailConfirmation = False
+    while emailConfirmation == False:
+        sleep(1)
+        email = str(input("\033[0;33mDigite seu email: \033[m"))
+        # VERIFICA SE O USUÁRIO QUER SAIR
+        if email == "0":
+            printReturningToMenu()
+            return logged, id
+        cursor.execute(f"SELECT * FROM clientes WHERE email = '{email}'")
+        resultado = cursor.fetchall()
+        # EMAIL JÁ FOI CADASTRADO
+        if resultado != []:
+            sleep(1)
+            print("\033[0;31mEsse email já foi cadastrado!\033[m")
+        else:
+           break
+    # CONFIRMAÇÃO DA SENHA
+    passwordConfirmation = False
+    while passwordConfirmation == False:
+        sleep(1)
+        password = str(input("\033[0;33mDigite sua senha: \033[m"))
+        # VERIFICA SE O USUÁRIO QUER SAIR
+        if password == "0":
+            printReturningToMenu()
+            return logged, id
+        sleep(1)
+        passwordConfirm = str(input("\033[0;33mConfirme a sua senha: \033[m"))
+        # VERIFICA SE O USUÁRIO QUER SAIR
+        if passwordConfirm == "0":
+            printReturningToMenu()
+            return logged, id
+        cursor.execute("SELECT * from clientes")
+        resultado = cursor.fetchall()
+        # DEFINIR O ID DO USUÁRIO
+        if resultado == []:
+            id = 0
+        else:
+            id = 0
+            for users in resultado:
+                id = id + 1
+        # AS SENHAS ESTÃO INCORRETAS
+        if password != passwordConfirm:
+            sleep(1)
+            print("\033[0;31mAs senhas não se coincidem!\033[m")
+        # ADICIONAR O USUÁRIO AO BANCO DE DADOS
+        else:
+            cursor.execute(f"INSERT INTO clientes (usuario, email, senha, id) VALUES('{username}', '{email}', '{password}', '{id}')")
+            cursor.execute(f'''CREATE TABLE IF NOT EXISTS '{id}' (
+                                nome varchar(1),
+                                preço varchar(1),
+                                quantidade varchar(1),
+                                id varchar(1))''')
+            connection.commit()
+            userInformations = cursor.execute(f"SELECT * FROM clientes WHERE usuario = '{username}' OR email = '{email}'")
+            userInformations = userInformations.fetchall()
+            sleep(1.5)
+            print(f"\033[0;32mSeja bem-vindo, {userInformations[0][0]}!\033[m")
+            passwordConfirmation = True
+            logged = True
+            sleep(1)
     return logged, id
 # LOGAR NA CONTA ====================================================================================================
 def Login():
+    logged = False
     inicio()
     # VERIFICAR SE EXISTE O NOME DE USUÁRIO OU EMAIL
-    sleep(1)
+    sleep(0.5)
     print("\033[0;36mDigite 0 à qualquer momento para sair do login!\033[m")
     usernameOrEmailExists = False
     while usernameOrEmailExists == False:
         usernameOrEmail = str(input("\033[0;33mDigite seu nome de usuário ou email: \033[m"))
         # VERIFICA SE O USUÁRIO QUER SAIR
         if usernameOrEmail == "0":
-            returningToTheMenu()
+            printReturningToMenu()
             usernameOrEmailExists = True
-            logged = False
-            break
-        user = cursor.execute(f"SELECT * FROM clientes WHERE usuario = '{usernameOrEmail}' OR email = '{usernameOrEmail}'")
-        user = user.fetchall()
+            return logged
+        userInformations = cursor.execute(f"SELECT * FROM clientes WHERE usuario = '{usernameOrEmail}' OR email = '{usernameOrEmail}'")
+        userInformations = userInformations.fetchall()
         # USUÁRIO OU EMAIL NÃO EXISTE
-        if user == []:
+        if userInformations == []:
             sleep(1)
             print("\033[0;31mEste usuário ou email não existe!\033[m")
             usernameOrEmailExists = False
         else:
-            usernameOrEmailExists = True
-            # CONFIRMAÇÃO DA SENHA
+            break
+    # CONFIRMAÇÃO DA SENHA
+    passwordConfirmation = False
+    while passwordConfirmation == False:
+        sleep(1)
+        password = str(input("\033[0;33mDigite sua senha: \033[m"))
+        # VERIFICA SE O USUÁRIO QUER SAIR
+        if password == "0":
+            printReturningToMenu()
+            passwordConfirmation = True
+            return logged
+        user_password = userInformations[0][2]
+        # AS SENHAS ESTÃO INCORRETAS
+        if password != user_password:
+            sleep(1)
+            print("\033[0;31mA senha está incorreta!\033[m")
             passwordConfirmation = False
-            while passwordConfirmation == False:
-                sleep(1)
-                password = str(input("\033[0;33mDigite sua senha: \033[m"))
-                # VERIFICA SE O USUÁRIO QUER SAIR
-                if password == "0":
-                    returningToTheMenu()
-                    passwordConfirmation = True
-                    logged = False
-                    break
-                user_password = user[0][2]
-                # AS SENHAS ESTÃO INCORRETAS
-                if password != user_password:
-                    sleep(1)
-                    print("\033[0;31mA senha está incorreta!\033[m")
-                    passwordConfirmation = False
-                else:
-                    # USUÁRIO ESTÁ LOGADO
-                    sleep(1.5)
-                    print(f"\033[0;32mSeja bem-vindo, {user[0][0]}!\033[m")
-                    passwordConfirmation = True
-                    logged = True
-                    sleep(1)
+        else:
+            # USUÁRIO ESTÁ LOGADO
+            sleep(1.5)
+            print(f"\033[0;32mSeja bem-vindo, {userInformations[0][0]}!\033[m")
+            passwordConfirmation = True
+            logged = True
+            sleep(1)
     return logged
 # MENU FINAL ========================================================================================================
 def finalMenu():
@@ -267,7 +259,7 @@ def registerProducts():
                 productName = str(input("\033[0;33mDigite o nome do seu produto: \033[m"))
                 # VERIFICA SE O USUÁRIO QUER SAIR
                 if productName == "0":
-                    returningToTheMenu()
+                    printReturningToMenu()
                     productConfirmation = True
                     adminConfirmation = True
                     break
@@ -288,7 +280,7 @@ def registerProducts():
                             priceConfirmation = False
                     # VERIFICA SE O USUÁRIO QUER SAIR
                     if productPrice == "0":
-                        returningToTheMenu()
+                        printReturningToMenu()
                         priceConfirmation = True
                         break
                     quantifyConfirmation = False
@@ -303,7 +295,7 @@ def registerProducts():
                             quantifyConfirmation = False
                     # VERIFICA SE O USUÁRIO QUER SAIR
                     if productQuantify == "0":
-                        returningToTheMenu()
+                        printReturningToMenu()
                         priceConfirmation = True
                         break
                     # SELECIONAR OS PRODUTOS NO BANCO DE DADOS
@@ -366,15 +358,20 @@ def buyProduct(id):
                 sleep(1)
                 inicio()
                 sleep(0.5)
+                print("\033[0;36mDigite 0 à qualquer momento para sair do registro dos produtos!\033[m")
                 print("\033[0;33mO produto escolhido foi:\033[m")
                 sleep(0.5)
-                print(f"\033[0;36m{product[0][0]} que custa R${float(product[0][1]):.2f} com {product[0][2]} quantidades em estoque e seu ID é {product[0][3]}.\033[m")
+                print(f"\033[0;32m{product[0][0]}\033[m que custa \033[0;32mR${float(product[0][1]):.2f}\033[m com \033[0;32m{product[0][2]}\033[m quantidades em estoque e seu ID é \033[0;32m{product[0][3]}.\033[m")
                 # CONFIRMAR A QUANTIDADE QUE O USUÁRIO QUE COMPRAR
                 productQuantifyConfirmation = False
                 while productQuantifyConfirmation == False:
                     sleep(1)
                     productQuantify = str(input("\033[0;33mDigite a quantidade que deseja comprar: \033[m"))
                     productQuantify = int(productQuantify)
+                    if productQuantify == 0:
+                        printReturningToMenu()
+                        productQuantifyConfirmation = True
+                        break
                     if productInCart == []:
                         productQuantifyAvaiable = int(product[0][2])
                         # QUANTIDADE ESTÁ DENTRO DAS REGRAS
@@ -477,7 +474,7 @@ def payTheCart(id):
                 installmentsConfirmation = False
                 while installmentsConfirmation == False:
                     sleep(1)
-                    installments = int(input(f"\033[0;33mEm quantas parcelas deseja pagar? \033[m"))
+                    installments = int(input(f"\033[0;33mEm quantas parcelas você deseja pagar? \033[m"))
                     if installments > 12:
                         sleep(1)
                         print("\033[0;31mQuantidade de parcelas maior que 12!\033[m")
@@ -491,7 +488,7 @@ def payTheCart(id):
                         break
             # RETORNANDO PARA O MENU
             elif option == 3:
-                returningToTheMenu()
+                printReturningToMenu()
                 break
             # OPÇÃO INVÁLIDA
             else:
