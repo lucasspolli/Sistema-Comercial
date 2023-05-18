@@ -8,53 +8,61 @@ cursor = connection.cursor()
 # TABELA CLIENTES
 def create_clients_table():
     cursor.execute('''CREATE TABLE IF NOT EXISTS clientes (
-                        usuario varchar(20),
-                        email varchar(20), 
-                        senha varchar(20), 
-                        id varchar(4))''')
+                        usuario varchar(1),
+                        email varchar(1), 
+                        senha varchar(1), 
+                        id varchar(1))''')
 # TABELA PRODUTOS
 def create_registred_products_table():
     cursor.execute('''CREATE TABLE IF NOT EXISTS produtos (
-                        nome varchar(20),
-                        preço varchar(20), 
-                        quantidade varchar(20), 
-                        id varchar(4))''')
+                        nome varchar(1),
+                        preço varchar(1), 
+                        quantidade varchar(1), 
+                        id varchar(1))''')
 # CRIAR A TABELA CLIENTES E PRODUTOS
 create_clients_table(), create_registred_products_table()
 # MENU INICIAL COM ESCOLHA DO USUÁRIO ==============================================================================
-def menu_inicial():
+def initialMenuOptions():
     logged = False
+    id = 0
     while logged == False:
         sleep(0.5)
-        botao_final = Menu_inicial()
-        if botao_final == 1:
+        initialButton = initialMenu()
+        if initialButton == 1:
             sleep(1)
-            logged = Register()
-        elif botao_final == 2:
+            logged, id = Register()
+        elif initialButton == 2:
             sleep(1)
             logged = Login()
-        elif botao_final == 3:
+        elif initialButton == 3:
             connection.close()
             break
         else:
             sleep(1)
             print(f"\033[0;31mOpção inválida!\033[m")
-    return logged
-logged = menu_inicial()
-# MENU FINAL COM ESCOLHA DO USUÁRIO ================================================================================
-def menu_final():
+            sleep(1)
+    return logged, id
+logged, id = initialMenuOptions()
+# MENU FINAL COM ESCOLHA DO USUÁRIO =================================================================================
+def finalMenuOptions(id):
     logged = True
     while logged == True:
         sleep(0.5)
-        botao_final = Menu_final()
-        if botao_final == 1:
+        finalButton = finalMenu()
+        if finalButton == 1:
             sleep(0.5)
-            Registred_products()
-        elif botao_final == 2:
+            registredProducts()
+        elif finalButton == 2:
             sleep(0.5)
-            Register_products()
-        elif botao_final == 3:
-            logged = menu_inicial()
+            registerProducts()
+        elif finalButton == 3:
+            sleep(0.5)
+            buyProduct(id)
+        elif finalButton == 4:
+            sleep(0.5)
+            payTheCart(id)
+        elif finalButton == 5:
+            logged = initialMenuOptions()
             if logged == True:
                 continue
             else:
@@ -62,7 +70,9 @@ def menu_final():
         else:
             sleep(1)
             print(f"\033[0;31mOpção inválida!\033[m")
-menu_final()
+            sleep(1)
+if logged == True:
+    finalMenuOptions(id)
 # FINALIZAÇÃO DO SISTEMA ===========================================================================================
 sleep(0.5)
 print("="*66)
