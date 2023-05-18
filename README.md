@@ -3,30 +3,45 @@
 Sistema Comercial é uma aplicação de um sistema desenvolvido para fins universitários com diversas funções utilizando como linguagem o Python.
 
 Dentre suas funções estão:
-- Cadastrar um usuário
+- Cadastrar e fazer login em uma conta de usuário.
 
-- Fazer login em uma conta cadastrada
+- Cadastrar e visualizar produtos no sistema.
 
-- Cadastrar produtos no sistema
+- Adicionar produtos cadastrados ao seu carrinho.
 
-- Visualizar a lista com os produtos cadastrados.
+- Pagar o seu carrinho. 
 #
 ### Linguagens Utilizadas 💻
 ![Python](http://ForTheBadge.com/images/badges/made-with-python.svg)
 #
 ### Como Rodar o Projeto 💽
-1º Passo - Certifique-se que o Python está instalado em sua máquina.
-
-2º Passo - Em uma pasta separada, no terminal, clone o projeto para a sua máquina utilizando o seguinte comando:
+1º Passo - Certifique-se que o Python está instalado em sua máquina utilizando o seguinte comando no terminal:
 
 ```
-git pull https://github.com/lucasspolli/Sistema-Comercial.git master
+python --version
 ```
 
-3º Passo - Rode o projeto utilizando o seguinte comando:
+2º Passo - Em uma pasta separada, abra o terminal e utilize o seguinte comando:
 
 ```
-python sistema.py
+git init
+```
+
+3º Passo - Clone o projeto para a sua máquina utilizando o seguinte comando:
+
+```
+git pull https://github.com/lucasspolli/Sistema-Comercial.git main
+```
+
+4º Passo - No terminal, acesse a pasta do arquivo principal utilizando os seguintes comandos em ordem:
+
+```
+cd src
+cd app
+```
+5º Passo - Rode o projeto utilizando o seguinte comando:
+```
+python main.py
 ```
 Pronto! Agora é só usufruir do sistema!
 #
