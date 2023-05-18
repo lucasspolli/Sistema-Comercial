@@ -30,7 +30,7 @@ git init
 3º Passo - Clone o projeto para a sua máquina utilizando o seguinte comando:
 
 ```
-git pull https://github.com/lucasspolli/Sistema-Comercial.git main
+git pull https://github.com/lucasspolli/Sistema-Comercial.git master
 ```
 
 4º Passo - No terminal, acesse a pasta do arquivo principal utilizando os seguintes comandos em ordem:
