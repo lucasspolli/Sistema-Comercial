@@ -95,7 +95,7 @@ class HomeScreen(DefaultScreen):
                 print("\033[0;31mAs senhas não se coincidem!\033[m")
             # ADICIONAR O USUÁRIO AO BANCO DE DADOS
             else:
-                cursor.execute(f"INSERT INTO clientes (usuario, email, senha, id) VALUES('{username}', '{email}', '{password}', '{id}')")
+                cursor.execute(f"INSERT INTO clientes (usuario, email, senha, id) VALUES('{username}', '{email}', '{password}', '{self.user.id}')")
                 cursor.execute(f'''CREATE TABLE IF NOT EXISTS '{self.user.id}' (
                                     nome varchar(1),
                                     preço varchar(1),
