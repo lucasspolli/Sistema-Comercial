@@ -3,7 +3,7 @@ import sys
 
 sys.path.insert(1, '../')
 
-from Database.tables import createClientsTable, createRegistredProductsTable, connection
+from Database.main import createTables
 
 from Screens.HomeScreen import HomeScreen
 from Screens.LoggedScreen import LoggedScreen
@@ -17,12 +17,9 @@ user = User()
 homeScreen = HomeScreen(user)
 loggedScreen = LoggedScreen(user)
 
-createClientsTable(), createRegistredProductsTable()
+createTables()
 
 homeScreen.showScreen()
-
-if user.isLogged:
-    loggedScreen.showScreen()
     
 sleep(0.5)
 print("="*66)

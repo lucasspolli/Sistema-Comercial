@@ -1,10 +1,17 @@
 from time import sleep
-from Database.tables import connection, cursor
+from Repositories.UsersRepository import UsersRepository
+from Repositories.CartsRepository import CartsRepository
+
+from app.main import loggedScreen
+
 import sys
 
 sys.path.insert(1, '../app/Screens')
 
 from DefaultScreen import DefaultScreen
+
+usersRepository = UsersRepository()
+cartsRepository = CartsRepository()
 
 class HomeScreen(DefaultScreen):
     def __init__(self, user):
@@ -30,129 +37,125 @@ class HomeScreen(DefaultScreen):
 
     def Register(self):
         self.banner()
-        # CONFIRMAÇÃO DO NOME DO USUÁRIO
+        
         sleep(0.5)
         print("\033[0;36mDigite 0 à qualquer momento para sair do cadastro!\033[m")
-        usernameConfirmation = False
-        while usernameConfirmation == False:
+        
+        while True:
             username = str(input("\033[0;33mDigite seu nome de usuário: \033[m"))
-            # VERIFICA SE O USUÁRIO QUER SAIR
+
             if username == "0":
                 self.printReturningToMenu()
-                usernameConfirmation = True
                 return
-            cursor.execute(f"SELECT * FROM clientes WHERE usuario = '{username}'")
-            result = cursor.fetchall()
-            # USUÁRIO JÁ EXISTE
-            if result != []:
+
+            userAlreadyExists = usersRepository.findByUsername(username)
+
+            if userAlreadyExists:
                 sleep(1)
                 print("\033[0;31mEsse usuário já foi cadastrado!\033[m")
             else:
                 break
-        # CONFIRMAÇÃO DO EMAIL
-        emailConfirmation = False
-        while emailConfirmation == False:
+
+        while True:
             sleep(1)
             email = str(input("\033[0;33mDigite seu email: \033[m"))
-            # VERIFICA SE O USUÁRIO QUER SAIR
+            
             if email == "0":
                 self.printReturningToMenu()
                 return
-            cursor.execute(f"SELECT * FROM clientes WHERE email = '{email}'")
-            result = cursor.fetchall()
-            # EMAIL JÁ FOI CADASTRADO
-            if result != []:
+            
+            emailAlreadyExists = usersRepository.findByEmail(email)
+            
+            if emailAlreadyExists:
                 sleep(1)
                 print("\033[0;31mEsse email já foi cadastrado!\033[m")
             else:
                 break
-        # CONFIRMAÇÃO DA SENHA
-        passwordConfirmation = False
-        while passwordConfirmation == False:
+                
+        while True:
             sleep(1)
             password = str(input("\033[0;33mDigite sua senha: \033[m"))
-            # VERIFICA SE O USUÁRIO QUER SAIR
+
             if password == "0":
                 self.printReturningToMenu()
                 return
+
             sleep(1)
             passwordConfirm = str(input("\033[0;33mConfirme a sua senha: \033[m"))
-            # VERIFICA SE O USUÁRIO QUER SAIR
+
             if passwordConfirm == "0":
                 self.printReturningToMenu()
                 return
-            cursor.execute("SELECT * from clientes")
-            result = cursor.fetchall()
-            # DEFINIR O ID DO USUÁRIO
-            if result == []:
-                pass
-            else:
-                for users in result:
-                    self.user.id += 1
-            # AS SENHAS ESTÃO INCORRETAS
+            
             if password != passwordConfirm:
                 sleep(1)
                 print("\033[0;31mAs senhas não se coincidem!\033[m")
-            # ADICIONAR O USUÁRIO AO BANCO DE DADOS
             else:
-                cursor.execute(f"INSERT INTO clientes (usuario, email, senha, id) VALUES('{username}', '{email}', '{password}', '{self.user.id}')")
-                cursor.execute(f'''CREATE TABLE IF NOT EXISTS '{self.user.id}' (
-                                    nome varchar(1),
-                                    preço varchar(1),
-                                    quantidade varchar(1),
-                                    id varchar(1))''')
-                connection.commit()
-                # TESTAR
-                # userInformations = cursor.execute(f"SELECT * FROM clientes WHERE usuario = '{username}' OR email = '{email}'")
-                # userInformations = userInformations.fetchall()
+                userId = usersRepository.create(username, email, password)
+
+                cartsRepository.create(userId)
+
                 sleep(1.5)
                 print(f"\n\033[0;32mSeja bem-vindo, {username}!\033[m")
-                self.user.isLogged = True
                 sleep(1)
+
+                self.user.isLogged = True
+                self.user.id = userId
+                
                 break
+
+        loggedScreen.showScreen()
 
     def Login(self):
         self.banner()
-        # VERIFICAR SE EXISTE O NOME DE USUÁRIO OU EMAIL
+        
         sleep(1)
         print("\033[0;36mDigite 0 à qualquer momento para sair do login!\033[m")
-        usernameOrEmailExists = False
-        while usernameOrEmailExists == False:
+
+        while True:
             usernameOrEmail = str(input("\033[0;33mDigite seu nome de usuário ou email: \033[m"))
-            # VERIFICA SE O USUÁRIO QUER SAIR
+
             if usernameOrEmail == "0":
                 self.printReturningToMenu()
                 return
-            cursor.execute(f"SELECT * FROM clientes WHERE usuario = '{usernameOrEmail}' OR email = '{usernameOrEmail}'")
-            userInformations = cursor.fetchall()
-            # USUÁRIO OU EMAIL NÃO EXISTE
-            if userInformations == []:
-                sleep(1)
-                print("\033[0;31mEste usuário ou email não existe!\033[m")
-            else:
+            
+            userExists = usersRepository.findByUsername(usernameOrEmail)
+
+            if userExists:
                 break
-        # CONFIRMAÇÃO DA SENHA
-        passwordConfirmation = False
-        while passwordConfirmation == False:
+
+            userExists = usersRepository.findByEmail(usernameOrEmail)
+
+            if userExists:
+                break
+            
             sleep(1)
-            password = str(input("\033[0;33mDigite sua senha: \033[m"))
-            # VERIFICA SE O USUÁRIO QUER SAIR
-            if password == "0":
+            print("\033[0;31mEste usuário ou email não existe!\033[m")
+
+        while True:
+            sleep(1)
+            typedPassword = str(input("\033[0;33mDigite sua senha: \033[m"))
+
+            if typedPassword == "0":
                 self.printReturningToMenu()
                 return
-            user_password = userInformations[0][2]
-            # AS SENHAS ESTÃO INCORRETAS
-            if password != user_password:
-                sleep(1)
-                print("\033[0;31mA senha está incorreta!\033[m")
-            else:
-                # USUÁRIO ESTÁ LOGADO
+            
+            if typedPassword == userExists.password:
+                cartsRepository.create(userExists.id)
+
                 sleep(1.5)
-                print(f"\n\033[0;32mSeja bem-vindo, {userInformations[0][0]}!\033[m")
+                print(f"\n\033[0;32mSeja bem-vindo, {userExists.username}!\033[m")
+
                 self.user.isLogged = True
+                self.user.id = userExists.id
+
                 sleep(1)
                 break
+           
+            sleep(1)
+            print("\033[0;31mA senha está incorreta!\033[m")
+
+        loggedScreen.showScreen()
     
     def Exit(self):
-        connection.close()
-        return
+        pass
