@@ -19,8 +19,14 @@ loggedScreen = LoggedScreen(user)
 
 createTables()
 
-homeScreen.showScreen()
-    
+while True:
+  homeScreen.showScreen()
+
+  if user.isLogged:
+    loggedScreen.showScreen()
+  else:
+    break
+
 sleep(0.5)
 print("="*66)
 sleep(0.5)

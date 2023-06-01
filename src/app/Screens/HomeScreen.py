@@ -2,8 +2,6 @@ from time import sleep
 from Repositories.UsersRepository import UsersRepository
 from Repositories.CartsRepository import CartsRepository
 
-from app.main import loggedScreen
-
 import sys
 
 sys.path.insert(1, '../app/Screens')
@@ -24,7 +22,7 @@ class HomeScreen(DefaultScreen):
             { "key": 3, "text": "Sair do menu", "handle": self.Exit }
         ]
 
-        while self.user.isLogged == False:
+        while not self.user.isLogged:
             self.banner(True)
             self.showOptions(options)
 
@@ -104,8 +102,6 @@ class HomeScreen(DefaultScreen):
                 
                 break
 
-        loggedScreen.showScreen()
-
     def Login(self):
         self.banner()
         
@@ -155,7 +151,6 @@ class HomeScreen(DefaultScreen):
             sleep(1)
             print("\033[0;31mA senha está incorreta!\033[m")
 
-        loggedScreen.showScreen()
-    
     def Exit(self):
+        self.user.isLogged = False
         pass

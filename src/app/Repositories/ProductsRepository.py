@@ -28,7 +28,7 @@ class ProductsRepository():
     def findByIds(self, ids):
         cursor.execute(f'''
             SELECT * FROM products
-            WHERE id in {tuple(ids)}
+            WHERE id IN {tuple(ids) if len(ids) > 1 else f'({ids[0]})'}
         ''')
 
         rows = cursor.fetchall()
@@ -51,12 +51,13 @@ class ProductsRepository():
         
         connection.commit()
 
-    def update(self, newName, newPrice, newQuantify):
+    def update(self, id, newName, newPrice, newQuantify):
         cursor.execute(f'''
             UPDATE products SET 
                 name = '{newName}',
                 price = '{newPrice}',
-                quantify = '{newQuantify}',
+                quantify = {newQuantify}
+            WHERE id = '{id}'
         ''')
 
         connection.commit()

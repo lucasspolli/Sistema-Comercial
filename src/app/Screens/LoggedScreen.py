@@ -1,10 +1,8 @@
 from time import sleep
-from DefaultScreen import DefaultScreen
+from Screens.DefaultScreen import DefaultScreen
 from Repositories.ProductsRepository import ProductsRepository
 from Repositories.UsersRepository import UsersRepository
 from Repositories.CartsRepository import CartsRepository
-
-from app.main import homeScreen
 
 productsRepository = ProductsRepository()
 usersRepository = UsersRepository()
@@ -16,14 +14,14 @@ class LoggedScreen(DefaultScreen):
       
     def showScreen(self):
         options = [
-            { "key": 1, "text": "Ver produtos cadastrados", "handle": self.RegistredProducts },
+            { "key": 1, "text": "Ver produtos cadastrados", "handle": self.RegisteredProducts },
             { "key": 2, "text": "Cadastrar produtos", "handle": self.RegisterProducts },
             { "key": 3, "text": "Comprar um produto", "handle": self.BuyProduct },
             { "key": 4, "text": "Pagar carrinho", "handle": self.PayTheCart },
             { "key": 5, "text": "Sair da conta", "handle": self.Exit }
         ]
 
-        while self.user.isLogged == True:
+        while self.user.isLogged:
             self.banner()
             self.showOptions(options)
 
@@ -34,8 +32,7 @@ class LoggedScreen(DefaultScreen):
             if selectedOption == 5:
                 break
         
-    # PRODUTOS CADASTRADOS ==============================================================================================
-    def RegistredProducts(self):
+    def RegisteredProducts(self):
         self.banner()
         
         sleep(0.5)
@@ -47,10 +44,9 @@ class LoggedScreen(DefaultScreen):
         productsList = productsRepository.findAll()
         
         if productsList:
-            # ARRUMAR ERRO DE TIPO DA VARIÁVEL
             for product in productsList:
                 sleep(0.3)
-                print(f"{product[0]:<22}R${float(product[1]):<15.2f}{product[2]:<12}{product[3]}")
+                print(f"{product.name:<22}R${float(product.price):<15.2f}{product.quantify:<12}{product.id}")
             
             while True:
                 sleep(0.5)
@@ -60,10 +56,8 @@ class LoggedScreen(DefaultScreen):
                     sleep(1)
                     print("\033[0;31mResposta inválida!\033[m")
                 else:
-                    sleep(1)
                     self.printReturningToMenu()
-                    sleep(0.5)
-                    break
+                    return
 
         sleep(1)
         print("\033[0;31mNo momento ainda não temos produtos em estoque!\033[m")
@@ -113,13 +107,12 @@ class LoggedScreen(DefaultScreen):
         while True:
             sleep(1)
             try:
-                typedProductPrice = str(input("\033[0;33mDigite o preço do seu produto: \033[m"))
+                typedProductPrice = float(input("\033[0;33mDigite o preço do seu produto: \033[m"))
                 break
             except ValueError:
                 sleep(1)
                 print("\033[0;31mDigite somente os números do preço ou digite com '.' os centavos!\033[m")
 
-        # VERIFICA SE O USUÁRIO QUER SAIR
         if typedProductPrice == 0:
             self.printReturningToMenu()
             return
@@ -133,7 +126,6 @@ class LoggedScreen(DefaultScreen):
                 sleep(1)
                 print("\033[0;31mDigite somente valores inteiros!\033[m")
 
-        # VERIFICA SE O USUÁRIO QUER SAIR
         if typedProductQuantify == 0:
             self.printReturningToMenu()
             return
@@ -195,15 +187,13 @@ class LoggedScreen(DefaultScreen):
                 usersRepository.update(userInformations.id, userInformations.username, userInformations.email, userInformations.password)
                 cartsRepository.addProduct(userInformations.id, typedProductId, typedProductQuantify)
 
-                print("\033[0;32mSeu produto foi adicionado ao carrinho!\033[m")
-
-                cartsRepository.seeCart()
-
-                sleep(1.5)
+                sleep(1)
+                print("\033[0;32m\nSeu produto foi adicionado ao carrinho!\033[m")
+                sleep(1)
                 break
 
             sleep(1)
-            print("\033[0;31mQuantidade digitada inválida!\033[m")
+            print("\033[0;31mA quantidade digitada é inválida!\033[m")
     
     def paymentMenu(self):
         print("="*66)
@@ -225,14 +215,11 @@ class LoggedScreen(DefaultScreen):
                  
         return option
 
-    def updateData(self, product):
-        for products in product:
-            # productInDatabase = cursor.execute(f"SELECT * FROM produtos WHERE id = '{products[3]}'")
-            productInDatabase = productInDatabase.fetchall()
-            productQuantify = int(productInDatabase[0][2]) - int(products[2])
-            
-            # cursor.execute(f"UPDATE produtos SET quantidade = '{productQuantify}' WHERE id = '{products[3]}'")
-            connection.commit()
+    def updateData(self, products, cartProducts):
+        for index, product in enumerate(products):
+            productQuantify = cartProducts[index]["quantify"]
+            newProductQuantify = (product.quantify - productQuantify)
+            productsRepository.update(product.id, product.name, product.price, newProductQuantify)
 
         sleep(1.5)
     
@@ -246,71 +233,66 @@ class LoggedScreen(DefaultScreen):
         
         cart = cartsRepository.findById(self.user.id)
 
-        if cart == []:
+        if cart["products"] == []:
             sleep(1)
             print(f"\033[0;32mVocê não tem produtos no carrinho!\033[m")
-            sleep(2)
+            sleep(1)
+            self.printReturningToMenu()
             return
         
-        productIds = map(lambda product: product['id'], cart['products'])
+        productsIds = list(map(lambda product: product["id"], cart["products"]))
 
-        products = productsRepository.findByIds(productIds)
+        products = list(productsRepository.findByIds(productsIds))
 
+        totalAmount = 0
+        
         for product in products:
-            sleep(0.3)
-            print(f"{product.name:<22}R${float(product.price):<15.2f}{product.quantify:<12}{product.id}")
-        
+            index = products.index(product)
+            productQuantify = cart["products"][index]["quantify"]
 
-        # SELECIONAR OS PRODUTOS NO BANCO DE DADOS
-        
-        # MOSTRAR AS INFORMAÇÕES DE TODOS OS PRODUTOS REGISTRADOS
-        # total = 0
-        # for products in product:
-        #     sleep(0.3)
-        #     #
-        #     print(f"{products[0]:<22}R${float(products[1]):<15.2f}{products[2]:<12}{products[3]}")
-        #     if products[2] == 1:
-        #         total = total + float(products[1])
-        #     else:
-        #         total = total + (float(products[1]) * int(products[2]))
-        # # VALOR TOTAL DO CARRINHO
-        # sleep(1)
-        # print(f"\033[0;32mO valor total do seu carrinho é R${total:.2f}\033[m")
-        # sleep(1)
-        # # PAGAMENTO
-        # while True:
-        #     option = self.paymentMenu()
-        #     # PAGOU COM DÉBITO
-        #     if option == 1:
-        #         self.updateData(product)
-        #         print(f"\033[0;32mVocê pagou R${total:.2f} no débito!\033[m")
-        #         sleep(2)
-        #         return
-        #     # PAGOU COM CRÉDTIO
-        #     elif option == 2:
-        #         break
-        #     # RETORNANDO PARA O MENU
-        #     elif option == 3:
-        #         self.printReturningToMenu()
-        #         return
-        #     # OPÇÃO INVÁLIDA
-        #     else:
-        #         sleep(1)
-        #         print("\033[0;31mOpção inválida!\033[m")
-        #         sleep(1)
-        # while True:
-        #     sleep(1)
-        #     installments = int(input(f"\033[0;33mEm quantas parcelas deseja pagar? \033[m"))
-        #     if installments > 12:
-        #         sleep(1)
-        #         print("\033[0;31mQuantidade de parcelas maior que 12!\033[m")
-        #     else:
-        #         self.updateData(product)
-        #         value = total / installments
-        #         print(f"\033[0;32mVocê irá pagar R${value:.2f} em {installments}x!\033[m")
-        #         sleep(2)
-        #         break
+            sleep(0.3)
+
+            print(f'{product.name:<22}R${float(product.price):<15.2f}{productQuantify:<12}{product.id}')
+
+            totalAmount += float(product.price) if (productQuantify == 1) else (float(product.price) * int(productQuantify))
+
+        sleep(1)
+        print(f"\033[0;32mO valor total do seu carrinho é R${totalAmount:.2f}\033[m")
+        sleep(1)
+
+        while True:
+            option = self.paymentMenu()
+            # PAGOU COM DÉBITO
+            if option == 1:
+                self.updateData(products, cart['products'])
+                print(f"\033[0;32mVocê pagou R${totalAmount:.2f} no débito!\033[m")
+                cart["products"] = []
+                sleep(2)
+                return
+            # PAGOU COM CRÉDTIO
+            elif option == 2:
+                break
+            # RETORNANDO PARA O MENU
+            elif option == 3:
+                self.printReturningToMenu()
+                return
+            # OPÇÃO INVÁLIDA
+            else:
+                sleep(1)
+                print("\033[0;31mOpção inválida!\033[m")
+                sleep(1)
+        while True:
+            sleep(1)
+            installments = int(input(f"\033[0;33mEm quantas parcelas deseja pagar? \033[m"))
+            if installments > 12:
+                sleep(1)
+                print("\033[0;31mQuantidade de parcelas maior que 12!\033[m")
+            else:
+                self.updateData(products, cart['products'])
+                amount = totalAmount / installments
+                print(f"\033[0;32mVocê irá pagar R${amount:.2f} em {installments}x!\033[m")
+                sleep(2)
+                break
             
     def Exit(self):
-        homeScreen.showScreen()
-        return
+        self.user.isLogged = False

@@ -27,9 +27,3 @@ class CartsRepository:
                 return
 
         cart["products"].append({ "id": productId, "quantify": productQuantify })
-
-    def seeCart(self):
-        print(carts)
-
-# RESETAR BANCO DE DADOS
-# IMPLEMENTAR CARRINHO
